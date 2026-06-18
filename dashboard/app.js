@@ -1,5 +1,5 @@
-const DATA_URL = "../output/pu_results.csv";
-const LOGO_URL = "../assets/africa-data-warehouse-logo.png";
+const DATA_URL = "/output/pu_results.csv";
+const LOGO_URL = "/assets/africa-data-warehouse-logo.png";
 
 const metaColumns = new Set([
   "State",
@@ -309,7 +309,7 @@ function renderPuDetail(rows) {
   const row = pu || rows[0] || {};
   const imageFile = row["Image File"] || "";
   const externalImage = row["Image URL"] || "";
-  const localImage = imageFile ? `../downloads/${imageFile.replaceAll("\\", "/")}` : "";
+  const localImage = imageFile ? `/downloads/${imageFile.replaceAll("\\", "/")}` : "";
   const imageHref = externalImage || localImage;
   els.documentStatus.textContent = imageHref ? "Result sheet available" : "No result-sheet file recorded";
   const items = [

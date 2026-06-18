@@ -1,0 +1,16 @@
+.git/
+.vercel/
+downloads/
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+API & JSON Header and URL.txt
+Election App.txt
+INEC Intelligence Result Spooling and Automation.docx
+INEC_PU_FULL_RESULTS.xlsx
+mongoDB connect.txt
+presidential_intelligence.py
+presidential_monitor.py
+scraper.py

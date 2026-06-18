@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Africa Data Warehouse Elections</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="../assets/africa-data-warehouse-logo.png" alt="Africa Data Warehouse">
+          <div>
+            <p class="eyebrow">Africa Data Warehouse</p>
+            <h1>FCT Area Council Election Results</h1>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="downloadCardBtn" type="button">Download Card</button>
+          <a href="../output/INEC_FCT_CHAIRMANSHIP_FULL_RESULTS.xlsx" download>Excel</a>
+          <a href="../output/pu_results.csv" download>CSV</a>
+        </div>
+      </header>
+
+      <section class="filters" aria-label="Result filters">
+        <label>
+          LGA
+          <select id="lgaSelect"></select>
+        </label>
+        <label>
+          Ward
+          <select id="wardSelect"></select>
+        </label>
+        <label>
+          Polling Unit
+          <select id="puSelect"></select>
+        </label>
+      </section>
+
+      <section class="summary-grid" aria-label="Headline totals">
+        <article>
+          <span>Total Registered</span>
+          <strong id="registeredTotal">0</strong>
+        </article>
+        <article>
+          <span>Total Accredited</span>
+          <strong id="accreditedTotal">0</strong>
+        </article>
+        <article>
+          <span>Valid Votes</span>
+          <strong id="validTotal">0</strong>
+        </article>
+        <article>
+          <span>Polling Units</span>
+          <strong id="puTotal">0</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="panel chart-panel">
+          <div class="panel-head">
+            <h2 id="scopeTitle">FCT Results</h2>
+            <p id="scopeSubtitle"></p>
+          </div>
+          <canvas id="partyChart" width="900" height="420"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Party Votes</h2>
+            <p id="winnerText"></p>
+          </div>
+          <div id="partyList" class="party-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace bottom">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>LGA Breakdown</h2>
+            <p id="lgaCount"></p>
+          </div>
+          <div id="lgaTable" class="table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Polling Unit Detail</h2>
+            <p id="documentStatus"></p>
+          </div>
+          <div id="puDetail" class="detail-grid"></div>
+        </div>
+      </section>
+
+      <canvas id="cardCanvas" width="1200" height="675" hidden></canvas>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -13,17 +13,21 @@
           <img src="/assets/africa-data-warehouse-logo.png" alt="Africa Data Warehouse">
           <div>
             <p class="eyebrow">Africa Data Warehouse</p>
-            <h1>FCT Area Council Election Results</h1>
+            <h1 id="pageTitle">State Election Results</h1>
           </div>
         </div>
         <div class="toolbar">
           <button id="downloadCardBtn" type="button">Download Card</button>
-          <a href="/output/INEC_FCT_CHAIRMANSHIP_FULL_RESULTS.xlsx" download>Excel</a>
-          <a href="/output/pu_results.csv" download>CSV</a>
+          <a id="excelDownload" href="/output/FCT/results.xlsx" download>Excel</a>
+          <a id="csvDownload" href="/output/FCT/pu_results.csv" download>CSV</a>
         </div>
       </header>
 
       <section class="filters" aria-label="Result filters">
+        <label>
+          State
+          <select id="stateSelect"></select>
+        </label>
         <label>
           LGA
           <select id="lgaSelect"></select>

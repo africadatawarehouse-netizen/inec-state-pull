@@ -1,5 +1,30 @@
-const DATA_URL = `/output/pu_results.csv?v=${Date.now()}`;
 const LOGO_URL = "/assets/africa-data-warehouse-logo.png";
+const STATES = {
+  FCT: {
+    label: "FCT",
+    title: "FCT Area Council Election Results",
+    dataUrl: "/output/FCT/pu_results.csv",
+    excelUrl: "/output/FCT/results.xlsx",
+    csvUrl: "/output/FCT/pu_results.csv",
+    cardSubtitle: "FCT Area Council Election Results",
+  },
+  Ekiti: {
+    label: "Ekiti",
+    title: "Ekiti Governorship Election Results",
+    dataUrl: "/output/Ekiti/pu_results.csv",
+    excelUrl: "/output/Ekiti/results.xlsx",
+    csvUrl: "/output/Ekiti/pu_results.csv",
+    cardSubtitle: "Ekiti Governorship Election Results",
+  },
+  Osun: {
+    label: "Osun",
+    title: "Osun Governorship Election Results",
+    dataUrl: "/output/Osun/pu_results.csv",
+    excelUrl: "/output/Osun/results.xlsx",
+    csvUrl: "/output/Osun/pu_results.csv",
+    cardSubtitle: "Osun Governorship Election Results",
+  },
+};
 
 const metaColumns = new Set([
   "State",
@@ -28,12 +53,17 @@ const metaColumns = new Set([
 ]);
 
 const state = {
+  selectedState: "FCT",
   rows: [],
   partyColumns: [],
   logo: null,
 };
 
 const els = {
+  pageTitle: document.querySelector("#pageTitle"),
+  stateSelect: document.querySelector("#stateSelect"),
+  excelDownload: document.querySelector("#excelDownload"),
+  csvDownload: document.querySelector("#csvDownload"),
   lgaSelect: document.querySelector("#lgaSelect"),
   wardSelect: document.querySelector("#wardSelect"),
   puSelect: document.querySelector("#puSelect"),
@@ -86,6 +116,13 @@ function parseCsv(text) {
 
   const headers = rows.shift() || [];
   return rows.map((values) => Object.fromEntries(headers.map((header, index) => [header, values[index] || ""])));
+}
+
+function stateFromPath() {
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  const candidate = parts[1] || "FCT";
+  const match = Object.keys(STATES).find((key) => key.toLowerCase() === candidate.toLowerCase());
+  return match || "FCT";
 }
 
 function num(value) {
@@ -157,6 +194,17 @@ function fillSelect(select, values, current = "All") {
   select.value = values.includes(current) ? current : "All";
 }
 
+function fillStateSelect(current) {
+  els.stateSelect.innerHTML = "";
+  Object.entries(STATES).forEach(([key, config]) => {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = config.label;
+    els.stateSelect.appendChild(option);
+  });
+  els.stateSelect.value = current;
+}
+
 function refreshFilters(changed) {
   const lga = els.lgaSelect.value || "All";
   const ward = els.wardSelect.value || "All";
@@ -196,6 +244,7 @@ function renderSummary(rows) {
   if (els.wardSelect.value !== "All") parts.push(els.wardSelect.value);
   if (els.puSelect.value !== "All") parts.push(els.puSelect.value);
   els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
+  if (!parts.length) els.scopeTitle.textContent = `${state.selectedState} Results`;
   els.scopeSubtitle.textContent = `${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
   return totals;
 }
@@ -351,7 +400,7 @@ function drawCard(rows, totals) {
   ctx.font = "700 32px system-ui";
   ctx.fillText("Africa Data Warehouse", 126, 52);
   ctx.font = "500 18px system-ui";
-  ctx.fillText("FCT Area Council Election Results", 126, 82);
+  ctx.fillText(STATES[state.selectedState].cardSubtitle, 126, 82);
 
   ctx.fillStyle = "rgba(39, 185, 211, 0.12)";
   ctx.font = "900 92px system-ui";
@@ -434,22 +483,44 @@ function render() {
 }
 
 async function boot() {
-  const [csvText] = await Promise.all([fetch(DATA_URL).then((res) => res.text())]);
+  state.selectedState = stateFromPath();
+  fillStateSelect(state.selectedState);
+  await loadStateData(state.selectedState);
+}
+
+async function loadStateData(stateKey) {
+  state.selectedState = stateKey;
+  const config = STATES[stateKey];
+  els.pageTitle.textContent = config.title;
+  els.excelDownload.href = config.excelUrl;
+  els.csvDownload.href = config.csvUrl;
+  els.stateSelect.value = stateKey;
+
+  const csvText = await fetch(`${config.dataUrl}?v=${Date.now()}`).then((res) => {
+    if (!res.ok) throw new Error(`${config.label} data file is not available yet.`);
+    return res.text();
+  });
   state.rows = parseCsv(csvText);
   state.partyColumns = Object.keys(state.rows[0] || {}).filter((key) => !metaColumns.has(key));
 
-  state.logo = new Image();
-  state.logo.src = LOGO_URL;
-  await new Promise((resolve) => {
-    state.logo.onload = resolve;
-    state.logo.onerror = resolve;
-  });
+  if (!state.logo) {
+    state.logo = new Image();
+    state.logo.src = LOGO_URL;
+    await new Promise((resolve) => {
+      state.logo.onload = resolve;
+      state.logo.onerror = resolve;
+    });
+  }
 
   fillSelect(els.lgaSelect, unique(state.rows.map((row) => row.LGA)));
   refreshFilters();
   render();
 }
 
+els.stateSelect.addEventListener("change", async () => {
+  await loadStateData(els.stateSelect.value);
+  window.history.replaceState({}, "", `/dashboard/${els.stateSelect.value}/`);
+});
 els.lgaSelect.addEventListener("change", () => render());
 els.wardSelect.addEventListener("change", () => render());
 els.puSelect.addEventListener("change", () => render());

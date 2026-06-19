@@ -2,13 +2,21 @@
 
 Africa Data Warehouse election result spooler and dashboard.
 
-## Current Pilot
+## Dashboards
 
-- Election: FCT Abuja Chairmanship, February 21, 2026
-- Dashboard: `dashboard/index.html`
+- FCT: `/dashboard/FCT/`
+- Ekiti: `/dashboard/Ekiti/`
+- Osun: `/dashboard/Osun/`
+- Manual backup feed: `/dashboard/manual/`
 - Local server: `python -m http.server 8080`
 - Local URL: `http://localhost:8080/dashboard/`
 - Planned domain: `elections.states.africadatawarehouse.org`
+
+The root dashboard has a state dropdown. State-specific data lives in:
+
+- `output/FCT/`
+- `output/Ekiti/`
+- `output/Osun/`
 
 ## Refresh Result Data
 
@@ -29,6 +37,22 @@ Single LGA/election test:
 ```powershell
 python full_results_downloader.py --election-id 6998247c6a7216db79726383 --no-downloads
 ```
+
+## Live State Spooling
+
+When the Ekiti or Osun IReV election type URL is available, run:
+
+```powershell
+python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-06-20 --interval 300
+```
+
+For Osun:
+
+```powershell
+python live_state_spooler.py --state Osun --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-08-15 --interval 300
+```
+
+Use `--download-files` if local result-sheet downloads are also needed.
 
 ## Generated Outputs
 

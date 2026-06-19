@@ -1,4 +1,5 @@
 const LOGO_URL = "/assets/africa-data-warehouse-logo.png";
+const MAP_URL = "/assets/maps/state_lga_boundaries.geojson";
 const STATES = {
   FCT: {
     label: "FCT",
@@ -57,6 +58,7 @@ const state = {
   rows: [],
   partyColumns: [],
   logo: null,
+  mapData: null,
 };
 
 const els = {
@@ -81,6 +83,9 @@ const els = {
   partyChart: document.querySelector("#partyChart"),
   partyList: document.querySelector("#partyList"),
   winnerText: document.querySelector("#winnerText"),
+  lgaMap: document.querySelector("#lgaMap"),
+  mapLegend: document.querySelector("#mapLegend"),
+  mapStatus: document.querySelector("#mapStatus"),
   lgaTable: document.querySelector("#lgaTable"),
   lgaCount: document.querySelector("#lgaCount"),
   puDetail: document.querySelector("#puDetail"),
@@ -510,6 +515,136 @@ function partyColor(code, index = 0) {
   return colors[code] || fallback[index % fallback.length];
 }
 
+function normalizeName(value) {
+  return String(value || "")
+    .trim()
+    .toUpperCase()
+    .replaceAll("&", "AND")
+    .replace(/[^A-Z0-9]+/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function featureCoordinates(feature) {
+  const coords = feature.geometry.coordinates;
+  return feature.geometry.type === "Polygon" ? [coords] : coords;
+}
+
+function collectPoints(feature) {
+  return featureCoordinates(feature).flat(2);
+}
+
+function pathForFeature(feature, project) {
+  return featureCoordinates(feature)
+    .map((polygon) =>
+      polygon
+        .map((ring) =>
+          ring
+            .map((point, index) => {
+              const [x, y] = project(point);
+              return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+            })
+            .join(" ") + " Z",
+        )
+        .join(" "),
+    )
+    .join(" ");
+}
+
+function centroidForFeature(feature, project) {
+  const points = collectPoints(feature).map(project);
+  const sum = points.reduce((acc, point) => [acc[0] + point[0], acc[1] + point[1]], [0, 0]);
+  return points.length ? [sum[0] / points.length, sum[1] / points.length] : [0, 0];
+}
+
+function renderMap() {
+  const features = (state.mapData?.features || []).filter((feature) => feature.properties.state === state.selectedState);
+  if (!features.length) {
+    els.lgaMap.innerHTML = "";
+    els.mapLegend.innerHTML = "";
+    els.mapStatus.textContent = "No boundary file loaded";
+    return;
+  }
+
+  const grouped = new Map();
+  state.rows.forEach((row) => {
+    const key = normalizeName(row.LGA);
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(row);
+  });
+
+  const stats = new Map();
+  grouped.forEach((items, key) => {
+    const totals = aggregate(items);
+    const leader = sortedParties(totals)[0] || { party: "No data", votes: 0 };
+    const uploaded = items.filter(hasUploadedResult).length;
+    stats.set(key, { items, totals, leader, uploaded });
+  });
+
+  const points = features.flatMap(collectPoints);
+  const xs = points.map((point) => point[0]);
+  const ys = points.map((point) => point[1]);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const width = 900;
+  const height = 520;
+  const pad = 24;
+  const scale = Math.min((width - pad * 2) / (maxX - minX || 1), (height - pad * 2) / (maxY - minY || 1));
+  const offsetX = (width - (maxX - minX) * scale) / 2;
+  const offsetY = (height - (maxY - minY) * scale) / 2;
+  const project = ([x, y]) => [offsetX + (x - minX) * scale, height - offsetY - (y - minY) * scale];
+
+  const selectedLga = normalizeName(els.lgaSelect.value);
+  const paths = features
+    .map((feature, index) => {
+      const lga = feature.properties.lga;
+      const key = normalizeName(lga);
+      const item = stats.get(key);
+      const color = item?.leader?.party ? partyColor(item.leader.party, index) : "#dfe8ea";
+      const selected = selectedLga !== "ALL" && selectedLga === key;
+      const [cx, cy] = centroidForFeature(feature, project);
+      const label = lga.length > 14 ? lga.replace(/\s+/g, "\n") : lga;
+      return `
+        <path class="${selected ? "is-selected" : ""}" d="${pathForFeature(feature, project)}" fill="${color}" opacity="${item ? "0.82" : "0.42"}" data-lga="${lga}">
+          <title>${lga}${item ? `: ${item.leader.party} leads with ${fmt(item.leader.votes)} votes` : ": no data yet"}</title>
+        </path>
+        <text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle">${label}</text>
+      `;
+    })
+    .join("");
+
+  els.lgaMap.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${state.selectedState} LGA map">${paths}</svg>`;
+  els.lgaMap.querySelectorAll("path[data-lga]").forEach((path) => {
+    path.addEventListener("click", () => {
+      const lga = path.getAttribute("data-lga");
+      if ([...els.lgaSelect.options].some((option) => normalizeName(option.value) === normalizeName(lga))) {
+        els.lgaSelect.value = [...els.lgaSelect.options].find((option) => normalizeName(option.value) === normalizeName(lga)).value;
+        els.wardSelect.value = "All";
+        els.puSelect.value = "All";
+        render();
+      }
+    });
+  });
+
+  const legendItems = [...stats.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([key, item], index) => {
+      const lga = item.items[0]?.LGA || key;
+      const percentUploaded = item.items.length ? (item.uploaded / item.items.length) * 100 : 0;
+      return `
+        <div class="legend-item">
+          <span class="legend-swatch" style="background:${partyColor(item.leader.party, index)}"></span>
+          <strong>${lga}</strong>
+          <span>${item.leader.party} · ${percentUploaded.toFixed(0)}%</span>
+        </div>
+      `;
+    })
+    .join("");
+  els.mapLegend.innerHTML = `${legendItems || `<div class="legend-item"><span class="legend-swatch"></span><strong>No results yet</strong><span>0%</span></div>`}<p class="map-source">Boundaries: geoBoundaries / GRID3, CC BY 4.0</p>`;
+  els.mapStatus.textContent = selectedLga === "ALL" ? "Click an LGA to drill down" : `${els.lgaSelect.value} selected`;
+}
+
 function drawRoundRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
@@ -887,6 +1022,7 @@ function render() {
   const totals = renderSummary(rows);
   renderChart(totals);
   renderPartyList(totals);
+  renderMap();
   renderLgaTable();
   renderPuDetail(rows);
 }
@@ -911,6 +1047,13 @@ async function loadStateData(stateKey) {
   });
   state.rows = parseCsv(csvText);
   state.partyColumns = Object.keys(state.rows[0] || {}).filter((key) => !metaColumns.has(key));
+
+  if (!state.mapData) {
+    state.mapData = await fetch(MAP_URL).then((res) => {
+      if (!res.ok) throw new Error("Boundary map file is not available.");
+      return res.json();
+    });
+  }
 
   if (!state.logo) {
     state.logo = new Image();

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manual Election Feed | Africa Data Warehouse</title>
+    <link rel="stylesheet" href="/dashboard/styles.css">
+    <style>
+      .feed-layout {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.4fr);
+        gap: 14px;
+      }
+
+      .feed-box {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 250px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px;
+        font: 12px ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+
+      input[type="file"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: white;
+        padding: 9px;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .button-row button {
+        min-height: 38px;
+        border: 1px solid var(--ink);
+        border-radius: 6px;
+        background: var(--ink);
+        color: white;
+        cursor: pointer;
+        padding: 8px 12px;
+      }
+
+      .button-row button.secondary {
+        border-color: var(--line);
+        background: white;
+        color: var(--ink);
+      }
+
+      .status-line {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 900px) {
+        .feed-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/assets/africa-data-warehouse-logo.png" alt="Africa Data Warehouse">
+          <div>
+            <p class="eyebrow">Backup Data Feed</p>
+            <h1>Manual Election Results Dashboard</h1>
+          </div>
+        </div>
+        <div class="toolbar">
+          <a href="/dashboard/FCT/">Live FCT</a>
+          <a href="/output/pu_results.csv" download>Download Current CSV</a>
+        </div>
+      </header>
+
+      <section class="feed-layout">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Manual Feed</h2>
+            <p id="feedStatus">Paste or upload CSV</p>
+          </div>
+          <div class="feed-box">
+            <input id="csvFile" type="file" accept=".csv,text/csv">
+            <textarea id="csvText" spellcheck="false" placeholder="Paste CSV content here. It should include columns such as State, LGA, Ward, Polling Unit, PU Code, Valid Votes, APC, PDP..."></textarea>
+            <div class="button-row">
+              <button id="loadFeedBtn" type="button">Load Feed</button>
+              <button id="sampleFeedBtn" class="secondary" type="button">Use Current FCT CSV</button>
+              <button id="clearFeedBtn" class="secondary" type="button">Clear</button>
+            </div>
+            <p class="status-line">Loaded data stays in this browser only. It does not overwrite the official deployed CSV.</p>
+          </div>
+        </div>
+
+        <div>
+          <section class="filters" aria-label="Manual result filters">
+            <label>
+              LGA
+              <select id="lgaSelect"></select>
+            </label>
+            <label>
+              Ward
+              <select id="wardSelect"></select>
+            </label>
+            <label>
+              Polling Unit
+              <select id="puSelect"></select>
+            </label>
+          </section>
+
+          <section class="summary-grid" aria-label="Manual headline totals">
+            <article>
+              <span>Total Registered</span>
+              <strong id="registeredTotal">0</strong>
+            </article>
+            <article>
+              <span>Total Accredited</span>
+              <strong id="accreditedTotal">0</strong>
+            </article>
+            <article>
+              <span>Valid Votes</span>
+              <strong id="validTotal">0</strong>
+            </article>
+            <article>
+              <span>Polling Units</span>
+              <strong id="puTotal">0</strong>
+            </article>
+          </section>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="panel chart-panel">
+          <div class="panel-head">
+            <h2 id="scopeTitle">Manual Feed</h2>
+            <p id="scopeSubtitle"></p>
+          </div>
+          <canvas id="partyChart" width="900" height="420"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Party Votes</h2>
+            <p id="winnerText"></p>
+          </div>
+          <div id="partyList" class="party-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace bottom">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>LGA Breakdown</h2>
+            <p id="lgaCount"></p>
+          </div>
+          <div id="lgaTable" class="table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Polling Unit Detail</h2>
+            <p id="documentStatus"></p>
+          </div>
+          <div id="puDetail" class="detail-grid"></div>
+        </div>
+      </section>
+    </main>
+    <script src="/dashboard/manual/manual.js"></script>
+  </body>
+</html>

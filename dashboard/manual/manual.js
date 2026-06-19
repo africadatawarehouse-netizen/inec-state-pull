@@ -1,5 +1,5 @@
-const DATA_URL = `/output/pu_results.csv?v=${Date.now()}`;
-const LOGO_URL = "/assets/africa-data-warehouse-logo.png";
+const STORAGE_KEY = "adw_manual_election_csv";
+const SAMPLE_URL = `/output/pu_results.csv?v=${Date.now()}`;
 
 const metaColumns = new Set([
   "State",
@@ -30,10 +30,15 @@ const metaColumns = new Set([
 const state = {
   rows: [],
   partyColumns: [],
-  logo: null,
 };
 
 const els = {
+  csvFile: document.querySelector("#csvFile"),
+  csvText: document.querySelector("#csvText"),
+  feedStatus: document.querySelector("#feedStatus"),
+  loadFeedBtn: document.querySelector("#loadFeedBtn"),
+  sampleFeedBtn: document.querySelector("#sampleFeedBtn"),
+  clearFeedBtn: document.querySelector("#clearFeedBtn"),
   lgaSelect: document.querySelector("#lgaSelect"),
   wardSelect: document.querySelector("#wardSelect"),
   puSelect: document.querySelector("#puSelect"),
@@ -50,8 +55,6 @@ const els = {
   lgaCount: document.querySelector("#lgaCount"),
   puDetail: document.querySelector("#puDetail"),
   documentStatus: document.querySelector("#documentStatus"),
-  downloadCardBtn: document.querySelector("#downloadCardBtn"),
-  cardCanvas: document.querySelector("#cardCanvas"),
 };
 
 function parseCsv(text) {
@@ -101,6 +104,17 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
+function fillSelect(select, values, current = "All") {
+  select.innerHTML = "";
+  ["All", ...values].forEach((value) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  });
+  select.value = values.includes(current) ? current : "All";
+}
+
 function getFilteredRows() {
   const lga = els.lgaSelect.value;
   const ward = els.wardSelect.value;
@@ -114,28 +128,16 @@ function getFilteredRows() {
 }
 
 function aggregate(rows) {
-  const totals = {
-    registered: 0,
-    accredited: 0,
-    valid: 0,
-    invalid: 0,
-    issued: 0,
-    used: 0,
-    parties: {},
-  };
-
+  const totals = { registered: 0, accredited: 0, valid: 0, invalid: 0, parties: {} };
   rows.forEach((row) => {
     totals.registered += num(row["Total Registered"]);
     totals.accredited += num(row["Total Accredited"]);
     totals.valid += num(row["Valid Votes"]);
     totals.invalid += num(row["Invalid Votes"]);
-    totals.issued += num(row["Ballots Issued"]);
-    totals.used += num(row["Ballots Used"]);
     state.partyColumns.forEach((party) => {
       totals.parties[party] = (totals.parties[party] || 0) + num(row[party]);
     });
   });
-
   return totals;
 }
 
@@ -146,42 +148,14 @@ function sortedParties(totals) {
     .sort((a, b) => b.votes - a.votes || a.party.localeCompare(b.party));
 }
 
-function fillSelect(select, values, current = "All") {
-  select.innerHTML = "";
-  ["All", ...values].forEach((value) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = value === "All" ? "All" : value;
-    select.appendChild(option);
-  });
-  select.value = values.includes(current) ? current : "All";
-}
-
-function refreshFilters(changed) {
+function refreshFilters() {
   const lga = els.lgaSelect.value || "All";
   const ward = els.wardSelect.value || "All";
   const wardRows = lga === "All" ? state.rows : state.rows.filter((row) => row.LGA === lga);
-
-  if (changed !== "ward" && changed !== "pu") {
-    fillSelect(els.wardSelect, unique(wardRows.map((row) => row.Ward)), ward);
-  }
-
+  fillSelect(els.wardSelect, unique(wardRows.map((row) => row.Ward)), ward);
   const selectedWard = els.wardSelect.value || "All";
   const puRows = wardRows.filter((row) => selectedWard === "All" || row.Ward === selectedWard);
-  fillSelect(
-    els.puSelect,
-    unique(puRows.map((row) => row["PU Code"])).map((code) => {
-      const found = puRows.find((row) => row["PU Code"] === code);
-      return found ? `${code}` : code;
-    }),
-    els.puSelect.value,
-  );
-}
-
-function selectedPuRow() {
-  const pu = els.puSelect.value;
-  if (pu === "All") return null;
-  return state.rows.find((row) => row["PU Code"] === pu) || null;
+  fillSelect(els.puSelect, unique(puRows.map((row) => row["PU Code"])), els.puSelect.value);
 }
 
 function renderSummary(rows) {
@@ -190,12 +164,11 @@ function renderSummary(rows) {
   els.accreditedTotal.textContent = fmt(totals.accredited);
   els.validTotal.textContent = fmt(totals.valid);
   els.puTotal.textContent = rows.length.toLocaleString();
-
   const parts = [];
   if (els.lgaSelect.value !== "All") parts.push(els.lgaSelect.value);
   if (els.wardSelect.value !== "All") parts.push(els.wardSelect.value);
   if (els.puSelect.value !== "All") parts.push(els.puSelect.value);
-  els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
+  els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "Manual Feed Results";
   els.scopeSubtitle.textContent = `${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
   return totals;
 }
@@ -207,11 +180,10 @@ function renderPartyList(totals) {
   els.partyList.innerHTML = parties
     .map((item, index) => {
       const colors = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f"];
-      const width = (item.votes / maxVotes) * 100;
       return `
         <div class="party-row">
           <div class="party-code">${item.party}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${colors[index % colors.length]}"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(item.votes / maxVotes) * 100}%;background:${colors[index % colors.length]}"></div></div>
           <div class="party-votes">${fmt(item.votes)}</div>
         </div>
       `;
@@ -245,7 +217,6 @@ function renderChart(totals) {
   const barWidth = chartWidth / Math.max(parties.length, 1) - 14;
 
   ctx.strokeStyle = "#d9e1e3";
-  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(left, top);
   ctx.lineTo(left, top + chartHeight);
@@ -305,122 +276,21 @@ function renderLgaTable() {
 }
 
 function renderPuDetail(rows) {
-  const pu = selectedPuRow();
-  const row = pu || rows[0] || {};
-  const imageFile = row["Image File"] || "";
-  const externalImage = row["Image URL"] || "";
-  const localImage = imageFile ? `/downloads/${imageFile.replaceAll("\\", "/")}` : "";
-  const imageHref = externalImage || localImage;
-  els.documentStatus.textContent = imageHref ? "Result sheet available" : "No result-sheet file recorded";
+  const row = rows[0] || {};
+  const href = row["Image URL"] || "";
+  els.documentStatus.textContent = href ? "Result sheet available" : "No result-sheet URL in selected row";
   const items = [
     ["Polling Unit", row["Polling Unit"] || ""],
     ["PU Code", row["PU Code"] || ""],
     ["Ward", row.Ward || ""],
     ["LGA", row.LGA || ""],
     ["Ballots Issued", fmt(row["Ballots Issued"])],
-    ["Ballots Used", fmt(row["Ballots Used"])],
     ["Invalid Votes", fmt(row["Invalid Votes"])],
-    ["Updated Time", row["Result Updated Time"] || ""],
   ];
-
-  els.puDetail.innerHTML = items
-    .map((item) => `<div class="detail-item"><span>${item[0]}</span><strong>${item[1]}</strong></div>`)
-    .join("");
-
-  if (imageHref) {
-    els.puDetail.insertAdjacentHTML(
-      "beforeend",
-      `<div class="detail-item"><span>Result Sheet</span><a href="${imageHref}" target="_blank" rel="noreferrer">Open file</a></div>`,
-    );
+  els.puDetail.innerHTML = items.map((item) => `<div class="detail-item"><span>${item[0]}</span><strong>${item[1]}</strong></div>`).join("");
+  if (href) {
+    els.puDetail.insertAdjacentHTML("beforeend", `<div class="detail-item"><span>Result Sheet</span><a href="${href}" target="_blank" rel="noreferrer">Open file</a></div>`);
   }
-}
-
-function drawCard(rows, totals) {
-  const canvas = els.cardCanvas;
-  const ctx = canvas.getContext("2d");
-  const parties = sortedParties(totals).slice(0, 5);
-  const title = els.scopeTitle.textContent;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#f7faf9";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#182022";
-  ctx.fillRect(0, 0, 1200, 112);
-
-  if (state.logo) ctx.drawImage(state.logo, 42, 24, 64, 64);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 32px system-ui";
-  ctx.fillText("Africa Data Warehouse", 126, 52);
-  ctx.font = "500 18px system-ui";
-  ctx.fillText("FCT Area Council Election Results", 126, 82);
-
-  ctx.fillStyle = "rgba(39, 185, 211, 0.12)";
-  ctx.font = "900 92px system-ui";
-  ctx.translate(600, 360);
-  ctx.rotate(-0.25);
-  ctx.textAlign = "center";
-  ctx.fillText("AFRICA DATA WAREHOUSE", 0, 0);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-  ctx.fillStyle = "#182022";
-  ctx.textAlign = "left";
-  ctx.font = "800 40px system-ui";
-  ctx.fillText(title, 52, 178);
-  ctx.font = "500 20px system-ui";
-  ctx.fillStyle = "#647174";
-  ctx.fillText(`${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`, 52, 212);
-
-  const metrics = [
-    ["Registered", fmt(totals.registered)],
-    ["Accredited", fmt(totals.accredited)],
-    ["Valid Votes", fmt(totals.valid)],
-    ["Invalid Votes", fmt(totals.invalid)],
-  ];
-  metrics.forEach((metric, index) => {
-    const x = 52 + index * 276;
-    ctx.fillStyle = "#ffffff";
-    ctx.strokeStyle = "#d9e1e3";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(x, 252, 248, 118, 8);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#647174";
-    ctx.font = "700 17px system-ui";
-    ctx.fillText(metric[0].toUpperCase(), x + 20, 292);
-    ctx.fillStyle = "#182022";
-    ctx.font = "800 34px system-ui";
-    ctx.fillText(metric[1], x + 20, 340);
-  });
-
-  const maxVotes = Math.max(...parties.map((item) => item.votes), 1);
-  parties.forEach((item, index) => {
-    const y = 430 + index * 42;
-    ctx.fillStyle = "#182022";
-    ctx.font = "800 22px system-ui";
-    ctx.fillText(item.party, 62, y);
-    ctx.fillStyle = "#e9eef0";
-    ctx.fillRect(150, y - 22, 700, 20);
-    ctx.fillStyle = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f", "#476a6f"][index];
-    ctx.fillRect(150, y - 22, 700 * (item.votes / maxVotes), 20);
-    ctx.fillStyle = "#182022";
-    ctx.textAlign = "right";
-    ctx.fillText(fmt(item.votes), 1040, y);
-    ctx.textAlign = "left";
-  });
-
-  ctx.fillStyle = "#647174";
-  ctx.font = "16px system-ui";
-  ctx.fillText("Source: INEC IReV public results data. Generated by Africa Data Warehouse.", 52, 636);
-}
-
-function downloadCard() {
-  const rows = getFilteredRows();
-  const totals = aggregate(rows);
-  drawCard(rows, totals);
-  const link = document.createElement("a");
-  link.download = `${els.scopeTitle.textContent.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_result_card.png`;
-  link.href = els.cardCanvas.toDataURL("image/png");
-  link.click();
 }
 
 function render() {
@@ -433,29 +303,67 @@ function render() {
   renderPuDetail(rows);
 }
 
-async function boot() {
-  const [csvText] = await Promise.all([fetch(DATA_URL).then((res) => res.text())]);
-  state.rows = parseCsv(csvText);
-  state.partyColumns = Object.keys(state.rows[0] || {}).filter((key) => !metaColumns.has(key));
-
-  state.logo = new Image();
-  state.logo.src = LOGO_URL;
-  await new Promise((resolve) => {
-    state.logo.onload = resolve;
-    state.logo.onerror = resolve;
-  });
-
+function loadCsv(text, sourceLabel) {
+  const rows = parseCsv(text);
+  if (!rows.length) throw new Error("No rows found in CSV.");
+  state.rows = rows;
+  state.partyColumns = Object.keys(rows[0]).filter((key) => !metaColumns.has(key));
+  localStorage.setItem(STORAGE_KEY, text);
   fillSelect(els.lgaSelect, unique(state.rows.map((row) => row.LGA)));
-  refreshFilters();
+  els.feedStatus.textContent = `${sourceLabel}: ${rows.length.toLocaleString()} rows, ${unique(rows.map((row) => row.LGA)).length} LGAs`;
   render();
 }
 
-els.lgaSelect.addEventListener("change", () => render());
-els.wardSelect.addEventListener("change", () => render());
-els.puSelect.addEventListener("change", () => render());
-els.downloadCardBtn.addEventListener("click", downloadCard);
+els.csvFile.addEventListener("change", async () => {
+  const file = els.csvFile.files[0];
+  if (!file) return;
+  const text = await file.text();
+  els.csvText.value = text;
+  loadCsv(text, file.name);
+});
+
+els.loadFeedBtn.addEventListener("click", () => {
+  try {
+    loadCsv(els.csvText.value, "Manual paste");
+  } catch (error) {
+    els.feedStatus.textContent = error.message;
+  }
+});
+
+els.sampleFeedBtn.addEventListener("click", async () => {
+  try {
+    const text = await fetch(SAMPLE_URL).then((response) => response.text());
+    els.csvText.value = text;
+    loadCsv(text, "Current FCT CSV");
+  } catch (error) {
+    els.feedStatus.textContent = error.message;
+  }
+});
+
+els.clearFeedBtn.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  els.csvText.value = "";
+  state.rows = [];
+  state.partyColumns = [];
+  fillSelect(els.lgaSelect, []);
+  fillSelect(els.wardSelect, []);
+  fillSelect(els.puSelect, []);
+  render();
+  els.feedStatus.textContent = "Manual feed cleared";
+});
+
+els.lgaSelect.addEventListener("change", render);
+els.wardSelect.addEventListener("change", render);
+els.puSelect.addEventListener("change", render);
 window.addEventListener("resize", () => renderChart(aggregate(getFilteredRows())));
 
-boot().catch((error) => {
-  document.body.innerHTML = `<main class="app-shell"><div class="panel"><div class="panel-head"><h1>Unable to load dashboard data</h1><p>${error.message}</p></div></div></main>`;
-});
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) {
+  els.csvText.value = saved;
+  loadCsv(saved, "Saved manual feed");
+} else {
+  fillSelect(els.lgaSelect, []);
+  fillSelect(els.wardSelect, []);
+  fillSelect(els.puSelect, []);
+  render();
+}

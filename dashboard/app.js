@@ -545,7 +545,7 @@ function drawCard(rows, totals) {
 function drawNumberCard(rows, totals) {
   const canvas = els.numberCardCanvas;
   const ctx = canvas.getContext("2d");
-  canvas.width = 1400;
+  canvas.width = 1440;
   canvas.height = 1800;
 
   const allParties = sortedParties(totals);
@@ -564,57 +564,50 @@ function drawNumberCard(rows, totals) {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, 1400, 1800);
+  ctx.fillRect(0, 0, 1440, 1800);
 
   ctx.strokeStyle = "#11191b";
   ctx.lineWidth = 18;
-  ctx.strokeRect(28, 28, 1344, 1744);
+  ctx.strokeRect(28, 28, 1384, 1744);
   ctx.strokeStyle = "#27b9d3";
   ctx.lineWidth = 6;
-  ctx.strokeRect(52, 52, 1296, 1696);
+  ctx.strokeRect(52, 52, 1336, 1696);
 
-  if (state.logo) {
-    ctx.save();
-    ctx.globalAlpha = 0.11;
-    ctx.drawImage(state.logo, 300, 480, 800, 800);
-    ctx.restore();
-  }
-
-  if (state.logo) ctx.drawImage(state.logo, 70, 70, 94, 94);
+  if (state.logo) ctx.drawImage(state.logo, 72, 66, 118, 118);
   ctx.fillStyle = ink;
   ctx.textAlign = "left";
-  ctx.font = `850 36px ${displayFont}`;
-  ctx.fillText("Africa Data Warehouse", 184, 112);
+  ctx.font = `900 40px ${displayFont}`;
+  ctx.fillText("Africa Data Warehouse", 214, 112);
   ctx.fillStyle = muted;
-  ctx.font = `500 22px ${textFont}`;
-  ctx.fillText("Election Number Card", 184, 148);
+  ctx.font = `600 24px ${textFont}`;
+  ctx.fillText("Election Number Card", 214, 150);
 
   ctx.textAlign = "right";
   ctx.fillStyle = ink;
   ctx.font = `850 24px ${displayFont}`;
-  ctx.fillText(scope.level.toUpperCase(), 1320, 104);
+  ctx.fillText(scope.level.toUpperCase(), 1368, 104);
   ctx.fillStyle = muted;
   ctx.font = `500 20px ${textFont}`;
-  ctx.fillText(new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }), 1320, 138);
+  ctx.fillText(new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }), 1368, 138);
 
   ctx.strokeStyle = line;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(70, 195);
-  ctx.lineTo(1330, 195);
+  ctx.lineTo(1370, 195);
   ctx.stroke();
 
   ctx.textAlign = "left";
   ctx.fillStyle = ink;
   ctx.font = `900 72px ${displayFont}`;
-  wrapText(ctx, scope.title, 72, 292, 1020, 76, 2);
+  wrapText(ctx, scope.title, 72, 292, 1060, 76, 2);
   ctx.fillStyle = muted;
   ctx.font = `500 27px ${textFont}`;
-  wrapText(ctx, scope.subtitle, 76, 430, 1020, 34, 2);
+  wrapText(ctx, scope.subtitle, 76, 430, 1060, 34, 2);
 
   const leaderColor = partyColor(leader.party);
   ctx.fillStyle = soft;
-  drawRoundRect(ctx, 72, 505, 1256, 430, 28);
+  drawRoundRect(ctx, 72, 505, 1296, 430, 28);
   ctx.fill();
   ctx.strokeStyle = line;
   ctx.lineWidth = 2;
@@ -631,16 +624,16 @@ function drawNumberCard(rows, totals) {
   ctx.textAlign = "left";
   ctx.fillStyle = muted;
   ctx.font = `850 24px ${displayFont}`;
-  ctx.fillText("LEADING PARTY", 420, 590);
+  ctx.fillText("LEADING PARTY", 420, 586);
   ctx.fillStyle = ink;
-  ctx.font = `950 110px ${displayFont}`;
+  ctx.font = `950 118px ${displayFont}`;
   ctx.fillText(leader.party, 420, 704);
   ctx.fillStyle = leaderColor;
-  ctx.font = `950 92px ${displayFont}`;
-  ctx.fillText(fmt(leader.votes), 420, 805);
+  ctx.font = `950 104px ${displayFont}`;
+  ctx.fillText(fmt(leader.votes), 420, 818);
   ctx.fillStyle = muted;
   ctx.font = `650 28px ${textFont}`;
-  ctx.fillText(`${leaderShare} of valid votes`, 420, 854);
+  ctx.fillText(`${leaderShare} of valid votes`, 420, 866);
 
   ctx.fillStyle = ink;
   ctx.font = `850 30px ${displayFont}`;
@@ -660,10 +653,10 @@ function drawNumberCard(rows, totals) {
   metricCards.forEach((metric, index) => {
     const col = index % 3;
     const row = Math.floor(index / 3);
-    const x = 72 + col * 426;
+    const x = 72 + col * 438;
     const y = 982 + row * 166;
     ctx.fillStyle = "#ffffff";
-    drawRoundRect(ctx, x, y, 390, 132, 18);
+    drawRoundRect(ctx, x, y, 400, 132, 18);
     ctx.fill();
     ctx.strokeStyle = line;
     ctx.lineWidth = 2;
@@ -679,7 +672,7 @@ function drawNumberCard(rows, totals) {
 
   const maxVotes = Math.max(...allParties.map((item) => item.votes), 1);
   ctx.fillStyle = "#ffffff";
-  drawRoundRect(ctx, 72, 1345, 1256, 340, 22);
+  drawRoundRect(ctx, 72, 1345, 1296, 340, 22);
   ctx.fill();
   ctx.strokeStyle = line;
   ctx.lineWidth = 2;
@@ -694,10 +687,10 @@ function drawNumberCard(rows, totals) {
   const rowsPerColumn = Math.ceil(allParties.length / columns) || 1;
   const rowHeight = Math.max(23, Math.min(42, Math.floor(240 / rowsPerColumn)));
   const rowFont = rowHeight < 28 ? 18 : rowHeight < 34 ? 21 : 24;
-  const columnWidth = columns === 3 ? 405 : 610;
+  const columnWidth = columns === 3 ? 418 : 630;
   const barX = columns === 3 ? 68 : 82;
   const barWidth = columns === 3 ? 170 : 280;
-  const valueX = columns === 3 ? 360 : 540;
+  const valueX = columns === 3 ? 372 : 560;
   allParties.forEach((item, index) => {
     const col = Math.floor(index / rowsPerColumn);
     const row = index % rowsPerColumn;
@@ -734,7 +727,7 @@ function drawNumberCard(rows, totals) {
   ctx.font = `500 20px ${textFont}`;
   ctx.fillText("Source: INEC IReV public result uploads. Generated by Africa Data Warehouse.", 72, 1740);
   ctx.textAlign = "right";
-  ctx.fillText("africadatawarehouse.org", 1328, 1740);
+  ctx.fillText("africadatawarehouse.org", 1368, 1740);
 }
 
 function downloadCard() {

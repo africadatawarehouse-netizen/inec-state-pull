@@ -221,12 +221,15 @@ function renderUploadProgress(rows) {
 function fillSelect(select, values, current = "All") {
   select.innerHTML = "";
   ["All", ...values].forEach((value) => {
+    const optionValue = typeof value === "object" ? value.value : value;
+    const optionLabel = typeof value === "object" ? value.label : value;
     const option = document.createElement("option");
-    option.value = value;
-    option.textContent = value === "All" ? "All" : value;
+    option.value = optionValue;
+    option.textContent = optionValue === "All" ? "All" : optionLabel;
     select.appendChild(option);
   });
-  select.value = values.includes(current) ? current : "All";
+  const availableValues = values.map((value) => (typeof value === "object" ? value.value : value));
+  select.value = availableValues.includes(current) ? current : "All";
 }
 
 function fillStateSelect(current) {
@@ -251,12 +254,22 @@ function refreshFilters(changed) {
 
   const selectedWard = els.wardSelect.value || "All";
   const puRows = wardRows.filter((row) => selectedWard === "All" || row.Ward === selectedWard);
+  const puNameCounts = puRows.reduce((counts, row) => {
+    const name = row["Polling Unit"] || row["PU Code"] || "Unnamed Polling Unit";
+    counts[name] = (counts[name] || 0) + 1;
+    return counts;
+  }, {});
+  const puOptions = unique(puRows.map((row) => row["PU Code"])).map((code) => {
+    const found = puRows.find((row) => row["PU Code"] === code) || {};
+    const name = found["Polling Unit"] || code;
+    return {
+      value: code,
+      label: puNameCounts[name] > 1 ? `${name} (${code})` : name,
+    };
+  });
   fillSelect(
     els.puSelect,
-    unique(puRows.map((row) => row["PU Code"])).map((code) => {
-      const found = puRows.find((row) => row["PU Code"] === code);
-      return found ? `${code}` : code;
-    }),
+    puOptions,
     els.puSelect.value,
   );
 }
@@ -277,7 +290,7 @@ function renderSummary(rows) {
   const parts = [];
   if (els.lgaSelect.value !== "All") parts.push(els.lgaSelect.value);
   if (els.wardSelect.value !== "All") parts.push(els.wardSelect.value);
-  if (els.puSelect.value !== "All") parts.push(els.puSelect.value);
+  if (els.puSelect.value !== "All") parts.push(els.puSelect.selectedOptions[0]?.textContent || els.puSelect.value);
   els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
   if (!parts.length) els.scopeTitle.textContent = `${state.selectedState} Results`;
   els.scopeSubtitle.textContent = `${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
@@ -390,7 +403,17 @@ function renderLgaTable() {
 
 function renderPuDetail(rows) {
   const pu = selectedPuRow();
-  const row = pu || rows[0] || {};
+  if (!pu) {
+    els.documentStatus.textContent = "Select a polling unit to view details";
+    els.puDetail.innerHTML = `
+      <div class="detail-empty">
+        <strong>Select a polling unit</strong>
+        <p>Use the Polling Unit dropdown above to choose a specific PU and this section will show the result sheet, vote metadata, and PU-level details.</p>
+      </div>
+    `;
+    return;
+  }
+  const row = pu;
   const imageFile = row["Image File"] || "";
   const externalImage = row["Image URL"] || "";
   const localImage = imageFile ? `/downloads/${imageFile.replaceAll("\\", "/")}` : "";

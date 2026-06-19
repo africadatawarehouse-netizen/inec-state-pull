@@ -364,6 +364,25 @@ th {
   text-decoration-color: var(--teal);
 }
 
+.detail-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #f7faf9;
+  padding: 18px;
+}
+
+.detail-empty strong {
+  display: block;
+  font-size: 18px;
+}
+
+.detail-empty p {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .modal[hidden] {
   display: none;
 }

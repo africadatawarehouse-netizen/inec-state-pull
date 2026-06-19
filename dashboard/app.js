@@ -80,11 +80,20 @@ const els = {
   lgaCount: document.querySelector("#lgaCount"),
   puDetail: document.querySelector("#puDetail"),
   documentStatus: document.querySelector("#documentStatus"),
+  viewCardBtn: document.querySelector("#viewCardBtn"),
   downloadCardBtn: document.querySelector("#downloadCardBtn"),
+  viewNumberCardBtn: document.querySelector("#viewNumberCardBtn"),
   downloadNumberCardBtn: document.querySelector("#downloadNumberCardBtn"),
   cardCanvas: document.querySelector("#cardCanvas"),
   numberCardCanvas: document.querySelector("#numberCardCanvas"),
+  cardPreviewModal: document.querySelector("#cardPreviewModal"),
+  cardPreviewTitle: document.querySelector("#cardPreviewTitle"),
+  cardPreviewImage: document.querySelector("#cardPreviewImage"),
+  closeCardPreviewBtn: document.querySelector("#closeCardPreviewBtn"),
+  downloadPreviewCardBtn: document.querySelector("#downloadPreviewCardBtn"),
 };
+
+let previewCardType = "number";
 
 function parseCsv(text) {
   const rows = [];
@@ -574,6 +583,21 @@ function drawNumberCard(rows, totals) {
   ctx.strokeRect(52, 52, 1336, 1696);
 
   if (state.logo) ctx.drawImage(state.logo, 72, 66, 118, 118);
+  if (state.logo) {
+    ctx.save();
+    ctx.globalAlpha = 0.11;
+    ctx.drawImage(state.logo, 1000, 235, 285, 285);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.translate(1125, 1250);
+  ctx.rotate(-0.28);
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(39, 185, 211, 0.10)";
+  ctx.font = `900 70px ${displayFont}`;
+  ctx.fillText("AFRICA DATA WAREHOUSE", 0, 0);
+  ctx.restore();
+
   ctx.fillStyle = ink;
   ctx.textAlign = "left";
   ctx.font = `900 40px ${displayFont}`;
@@ -730,24 +754,55 @@ function drawNumberCard(rows, totals) {
   ctx.fillText("africadatawarehouse.org", 1368, 1740);
 }
 
-function downloadCard() {
+function cardFileName(suffix) {
+  return `${els.scopeTitle.textContent.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_${suffix}.png`;
+}
+
+function renderCardCanvas(type) {
   const rows = getFilteredRows();
   const totals = aggregate(rows);
+  if (type === "number") {
+    drawNumberCard(rows, totals);
+    return els.numberCardCanvas;
+  }
   drawCard(rows, totals);
+  return els.cardCanvas;
+}
+
+function downloadCanvas(canvas, filename) {
   const link = document.createElement("a");
-  link.download = `${els.scopeTitle.textContent.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_result_card.png`;
-  link.href = els.cardCanvas.toDataURL("image/png");
+  link.download = filename;
+  link.href = canvas.toDataURL("image/png");
   link.click();
 }
 
+function downloadCard() {
+  downloadCanvas(renderCardCanvas("report"), cardFileName("result_card"));
+}
+
 function downloadNumberCard() {
-  const rows = getFilteredRows();
-  const totals = aggregate(rows);
-  drawNumberCard(rows, totals);
-  const link = document.createElement("a");
-  link.download = `${els.scopeTitle.textContent.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_number_card.png`;
-  link.href = els.numberCardCanvas.toDataURL("image/png");
-  link.click();
+  downloadCanvas(renderCardCanvas("number"), cardFileName("number_card"));
+}
+
+function viewCard(type) {
+  previewCardType = type;
+  const canvas = renderCardCanvas(type);
+  els.cardPreviewTitle.textContent = type === "number" ? "Number Card Preview" : "Report Card Preview";
+  els.cardPreviewImage.src = canvas.toDataURL("image/png");
+  els.cardPreviewModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeCardPreview() {
+  els.cardPreviewModal.hidden = true;
+  els.cardPreviewImage.removeAttribute("src");
+  document.body.style.overflow = "";
+}
+
+function downloadPreviewCard() {
+  const canvas = renderCardCanvas(previewCardType);
+  const suffix = previewCardType === "number" ? "number_card" : "result_card";
+  downloadCanvas(canvas, cardFileName(suffix));
 }
 
 function render() {
@@ -802,8 +857,18 @@ els.stateSelect.addEventListener("change", async () => {
 els.lgaSelect.addEventListener("change", () => render());
 els.wardSelect.addEventListener("change", () => render());
 els.puSelect.addEventListener("change", () => render());
+els.viewCardBtn.addEventListener("click", () => viewCard("report"));
 els.downloadCardBtn.addEventListener("click", downloadCard);
+els.viewNumberCardBtn.addEventListener("click", () => viewCard("number"));
 els.downloadNumberCardBtn.addEventListener("click", downloadNumberCard);
+els.closeCardPreviewBtn.addEventListener("click", closeCardPreview);
+els.downloadPreviewCardBtn.addEventListener("click", downloadPreviewCard);
+els.cardPreviewModal.addEventListener("click", (event) => {
+  if (event.target === els.cardPreviewModal) closeCardPreview();
+});
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !els.cardPreviewModal.hidden) closeCardPreview();
+});
 window.addEventListener("resize", () => renderChart(aggregate(getFilteredRows())));
 
 boot().catch((error) => {

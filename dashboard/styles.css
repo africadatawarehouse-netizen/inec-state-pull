@@ -293,6 +293,74 @@ th {
   text-decoration-color: var(--teal);
 }
 
+.modal[hidden] {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(10, 18, 20, 0.72);
+}
+
+.modal-panel {
+  width: min(960px, 100%);
+  max-height: min(94vh, 980px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  overflow: hidden;
+}
+
+.modal-head,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.modal button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.preview-frame {
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+  background: #eef4f5;
+  text-align: center;
+}
+
+.preview-frame img {
+  display: inline-block;
+  max-width: min(100%, 720px);
+  max-height: 74vh;
+  background: white;
+  box-shadow: 0 16px 52px rgba(20, 33, 37, 0.22);
+}
+
 @media (max-width: 900px) {
   .topbar,
   .workspace,

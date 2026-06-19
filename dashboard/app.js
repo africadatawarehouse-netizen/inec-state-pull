@@ -580,7 +580,10 @@ function renderMap() {
     stats.set(key, { items, totals, leader, uploaded });
   });
 
-  const points = features.flatMap(collectPoints);
+  const selectedLga = normalizeName(els.lgaSelect.value);
+  const selectedFeature = selectedLga === "ALL" ? null : features.find((feature) => normalizeName(feature.properties.lga) === selectedLga);
+  const viewFeatures = selectedFeature ? [selectedFeature] : features;
+  const points = viewFeatures.flatMap(collectPoints);
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   const minX = Math.min(...xs);
@@ -595,7 +598,6 @@ function renderMap() {
   const offsetY = (height - (maxY - minY) * scale) / 2;
   const project = ([x, y]) => [offsetX + (x - minX) * scale, height - offsetY - (y - minY) * scale];
 
-  const selectedLga = normalizeName(els.lgaSelect.value);
   const paths = features
     .map((feature, index) => {
       const lga = feature.properties.lga;
@@ -619,7 +621,11 @@ function renderMap() {
     path.addEventListener("click", () => {
       const lga = path.getAttribute("data-lga");
       if ([...els.lgaSelect.options].some((option) => normalizeName(option.value) === normalizeName(lga))) {
-        els.lgaSelect.value = [...els.lgaSelect.options].find((option) => normalizeName(option.value) === normalizeName(lga)).value;
+        const clickedLga = normalizeName(lga);
+        const alreadySelected = normalizeName(els.lgaSelect.value) === clickedLga;
+        els.lgaSelect.value = alreadySelected
+          ? "All"
+          : [...els.lgaSelect.options].find((option) => normalizeName(option.value) === clickedLga).value;
         els.wardSelect.value = "All";
         els.puSelect.value = "All";
         render();
@@ -642,7 +648,7 @@ function renderMap() {
     })
     .join("");
   els.mapLegend.innerHTML = `${legendItems || `<div class="legend-item"><span class="legend-swatch"></span><strong>No results yet</strong><span>0%</span></div>`}<p class="map-source">Boundaries: geoBoundaries / GRID3, CC BY 4.0</p>`;
-  els.mapStatus.textContent = selectedLga === "ALL" ? "Click an LGA to drill down" : `${els.lgaSelect.value} selected`;
+  els.mapStatus.textContent = selectedLga === "ALL" ? "Click an LGA to zoom in" : `${els.lgaSelect.value} selected · click again to zoom out`;
 }
 
 function drawRoundRect(ctx, x, y, width, height, radius) {

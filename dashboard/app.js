@@ -384,82 +384,238 @@ function renderPuDetail(rows) {
   }
 }
 
+function percent(part, whole) {
+  if (!whole) return "0.0%";
+  return `${((part / whole) * 100).toFixed(1)}%`;
+}
+
+function getScopeDetails(rows) {
+  const selectedPu = selectedPuRow();
+  if (selectedPu) {
+    return {
+      level: "Polling Unit",
+      title: selectedPu["Polling Unit"] || selectedPu["PU Code"] || "Polling Unit",
+      subtitle: `${selectedPu.LGA || state.selectedState} / ${selectedPu.Ward || ""} / ${selectedPu["PU Code"] || ""}`,
+    };
+  }
+  if (els.wardSelect.value !== "All") {
+    return {
+      level: "Ward",
+      title: els.wardSelect.value,
+      subtitle: `${els.lgaSelect.value} LGA, ${state.selectedState}`,
+    };
+  }
+  if (els.lgaSelect.value !== "All") {
+    return {
+      level: "LGA",
+      title: `${els.lgaSelect.value} LGA`,
+      subtitle: `${state.selectedState} ${STATES[state.selectedState].cardSubtitle}`,
+    };
+  }
+  return {
+    level: "State",
+    title: `${state.selectedState} State`,
+    subtitle: STATES[state.selectedState].cardSubtitle,
+  };
+}
+
+function partyColor(code, index = 0) {
+  const colors = {
+    APC: "#14924a",
+    PDP: "#d62f35",
+    LP: "#c41230",
+    ADC: "#254aa5",
+    SDP: "#1f7a4d",
+    APGA: "#f0b323",
+    NNPP: "#2f80ed",
+    ADP: "#7b4fc9",
+  };
+  const fallback = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f", "#5863a3", "#8d4776"];
+  return colors[code] || fallback[index % fallback.length];
+}
+
+function drawRoundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, height, radius);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
+  const words = String(text || "").split(/\s+/);
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  lines.slice(0, maxLines).forEach((item, index) => {
+    const suffix = index === maxLines - 1 && lines.length > maxLines ? "..." : "";
+    ctx.fillText(`${item}${suffix}`, x, y + index * lineHeight);
+  });
+}
+
 function drawCard(rows, totals) {
   const canvas = els.cardCanvas;
   const ctx = canvas.getContext("2d");
-  const parties = sortedParties(totals).slice(0, 5);
-  const title = els.scopeTitle.textContent;
+  canvas.width = 1400;
+  canvas.height = 1800;
+
+  const parties = sortedParties(totals).slice(0, 6);
+  const leader = parties[0] || { party: "N/A", votes: 0 };
+  const runnerUp = parties[1] || { party: "N/A", votes: 0 };
+  const scope = getScopeDetails(rows);
+  const leadMargin = Math.max(leader.votes - runnerUp.votes, 0);
+  const turnout = percent(totals.accredited, totals.registered);
+  const validShare = percent(totals.valid, totals.accredited);
+  const leaderShare = percent(leader.votes, totals.valid);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#f7faf9";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#182022";
-  ctx.fillRect(0, 0, 1200, 112);
+  const gradient = ctx.createLinearGradient(0, 0, 1400, 1800);
+  gradient.addColorStop(0, "#071014");
+  gradient.addColorStop(0.42, "#10292c");
+  gradient.addColorStop(1, "#f8fbfa");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1400, 1800);
 
-  if (state.logo) ctx.drawImage(state.logo, 42, 24, 64, 64);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 32px system-ui";
-  ctx.fillText("Africa Data Warehouse", 126, 52);
-  ctx.font = "500 18px system-ui";
-  ctx.fillText(STATES[state.selectedState].cardSubtitle, 126, 82);
+  ctx.fillStyle = "rgba(39, 185, 211, 0.18)";
+  ctx.beginPath();
+  ctx.arc(1180, 190, 250, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(216, 151, 32, 0.16)";
+  ctx.beginPath();
+  ctx.arc(190, 1160, 320, 0, Math.PI * 2);
+  ctx.fill();
 
-  ctx.fillStyle = "rgba(39, 185, 211, 0.12)";
-  ctx.font = "900 92px system-ui";
-  ctx.translate(600, 360);
-  ctx.rotate(-0.25);
+  ctx.save();
+  ctx.translate(700, 940);
+  ctx.rotate(-0.36);
   ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  ctx.font = "900 118px system-ui";
   ctx.fillText("AFRICA DATA WAREHOUSE", 0, 0);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.restore();
 
-  ctx.fillStyle = "#182022";
+  if (state.logo) ctx.drawImage(state.logo, 70, 70, 94, 94);
+  ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
-  ctx.font = "800 40px system-ui";
-  ctx.fillText(title, 52, 178);
-  ctx.font = "500 20px system-ui";
-  ctx.fillStyle = "#647174";
-  ctx.fillText(`${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`, 52, 212);
+  ctx.font = "800 34px system-ui";
+  ctx.fillText("Africa Data Warehouse", 184, 112);
+  ctx.fillStyle = "rgba(255,255,255,0.72)";
+  ctx.font = "500 22px system-ui";
+  ctx.fillText("Election Intelligence Result Card", 184, 148);
 
-  const metrics = [
-    ["Registered", fmt(totals.registered)],
-    ["Accredited", fmt(totals.accredited)],
-    ["Valid Votes", fmt(totals.valid)],
-    ["Invalid Votes", fmt(totals.invalid)],
+  ctx.textAlign = "right";
+  ctx.fillStyle = "rgba(255,255,255,0.84)";
+  ctx.font = "800 24px system-ui";
+  ctx.fillText(scope.level.toUpperCase(), 1320, 104);
+  ctx.font = "500 20px system-ui";
+  ctx.fillText(new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }), 1320, 138);
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 70px system-ui";
+  wrapText(ctx, scope.title, 72, 280, 850, 78, 2);
+  ctx.fillStyle = "rgba(255,255,255,0.74)";
+  ctx.font = "500 26px system-ui";
+  wrapText(ctx, scope.subtitle, 76, 430, 900, 34, 2);
+
+  const leaderColor = partyColor(leader.party);
+  ctx.fillStyle = "#ffffff";
+  drawRoundRect(ctx, 72, 530, 1256, 520, 38);
+  ctx.fill();
+  ctx.fillStyle = "#f2f7f7";
+  drawRoundRect(ctx, 98, 556, 1204, 468, 30);
+  ctx.fill();
+
+  ctx.fillStyle = leaderColor;
+  ctx.beginPath();
+  ctx.arc(278, 760, 132, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.font = "900 64px system-ui";
+  ctx.fillText(leader.party, 278, 780);
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#607174";
+  ctx.font = "800 24px system-ui";
+  ctx.fillText("LEADING PARTY", 460, 650);
+  ctx.fillStyle = "#162326";
+  ctx.font = "900 108px system-ui";
+  ctx.fillText(leader.party, 460, 760);
+  ctx.fillStyle = leaderColor;
+  ctx.font = "900 74px system-ui";
+  ctx.fillText(fmt(leader.votes), 460, 850);
+  ctx.fillStyle = "#607174";
+  ctx.font = "600 28px system-ui";
+  ctx.fillText(`${leaderShare} of valid votes`, 460, 895);
+
+  ctx.fillStyle = "#162326";
+  ctx.font = "800 30px system-ui";
+  ctx.fillText(`Lead margin: ${fmt(leadMargin)}`, 460, 958);
+  ctx.fillStyle = "#607174";
+  ctx.font = "500 23px system-ui";
+  ctx.fillText(`Runner-up: ${runnerUp.party} (${fmt(runnerUp.votes)})`, 460, 994);
+
+  const metricCards = [
+    ["Valid Votes", fmt(totals.valid), "#162326"],
+    ["Accredited", fmt(totals.accredited), "#1f7a4d"],
+    ["Registered", fmt(totals.registered), "#5863a3"],
+    ["Polling Units", rows.length.toLocaleString(), "#d89720"],
+    ["Invalid Votes", fmt(totals.invalid), "#b7433f"],
+    ["Turnout", turnout, "#27b9d3"],
   ];
-  metrics.forEach((metric, index) => {
-    const x = 52 + index * 276;
+  metricCards.forEach((metric, index) => {
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    const x = 72 + col * 426;
+    const y = 1108 + row * 180;
     ctx.fillStyle = "#ffffff";
-    ctx.strokeStyle = "#d9e1e3";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(x, 252, 248, 118, 8);
+    drawRoundRect(ctx, x, y, 390, 142, 24);
     ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#647174";
-    ctx.font = "700 17px system-ui";
-    ctx.fillText(metric[0].toUpperCase(), x + 20, 292);
-    ctx.fillStyle = "#182022";
-    ctx.font = "800 34px system-ui";
-    ctx.fillText(metric[1], x + 20, 340);
+    ctx.fillStyle = metric[2];
+    ctx.font = "900 42px system-ui";
+    ctx.textAlign = "left";
+    ctx.fillText(metric[1], x + 28, y + 68);
+    ctx.fillStyle = "#607174";
+    ctx.font = "800 19px system-ui";
+    ctx.fillText(metric[0].toUpperCase(), x + 28, y + 108);
   });
 
   const maxVotes = Math.max(...parties.map((item) => item.votes), 1);
+  ctx.fillStyle = "#162326";
+  ctx.font = "900 30px system-ui";
+  ctx.fillText("TOP PARTY TOTALS", 72, 1512);
   parties.forEach((item, index) => {
-    const y = 430 + index * 42;
-    ctx.fillStyle = "#182022";
-    ctx.font = "800 22px system-ui";
-    ctx.fillText(item.party, 62, y);
-    ctx.fillStyle = "#e9eef0";
-    ctx.fillRect(150, y - 22, 700, 20);
-    ctx.fillStyle = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f", "#476a6f"][index];
-    ctx.fillRect(150, y - 22, 700 * (item.votes / maxVotes), 20);
-    ctx.fillStyle = "#182022";
+    const y = 1570 + index * 42;
+    const color = partyColor(item.party, index);
+    ctx.fillStyle = color;
+    ctx.font = "900 24px system-ui";
+    ctx.fillText(item.party, 72, y);
+    ctx.fillStyle = "rgba(22,35,38,0.12)";
+    drawRoundRect(ctx, 190, y - 25, 760, 18, 9);
+    ctx.fill();
+    ctx.fillStyle = color;
+    drawRoundRect(ctx, 190, y - 25, 760 * (item.votes / maxVotes), 18, 9);
+    ctx.fill();
+    ctx.fillStyle = "#162326";
     ctx.textAlign = "right";
-    ctx.fillText(fmt(item.votes), 1040, y);
+    ctx.font = "800 24px system-ui";
+    ctx.fillText(fmt(item.votes), 1294, y);
     ctx.textAlign = "left";
   });
 
-  ctx.fillStyle = "#647174";
-  ctx.font = "16px system-ui";
-  ctx.fillText("Source: INEC IReV public results data. Generated by Africa Data Warehouse.", 52, 636);
+  ctx.fillStyle = "#607174";
+  ctx.font = "500 20px system-ui";
+  ctx.fillText("Source: INEC IReV public result uploads. Generated by Africa Data Warehouse.", 72, 1740);
+  ctx.textAlign = "right";
+  ctx.fillText("africadatawarehouse.org", 1328, 1740);
 }
 
 function downloadCard() {

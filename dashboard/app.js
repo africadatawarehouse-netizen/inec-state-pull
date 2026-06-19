@@ -548,101 +548,117 @@ function drawNumberCard(rows, totals) {
   canvas.width = 1400;
   canvas.height = 1800;
 
-  const parties = sortedParties(totals).slice(0, 6);
-  const leader = parties[0] || { party: "N/A", votes: 0 };
-  const runnerUp = parties[1] || { party: "N/A", votes: 0 };
+  const allParties = sortedParties(totals);
+  const leader = allParties[0] || { party: "N/A", votes: 0 };
+  const runnerUp = allParties[1] || { party: "N/A", votes: 0 };
   const scope = getScopeDetails(rows);
   const leadMargin = Math.max(leader.votes - runnerUp.votes, 0);
   const turnout = percent(totals.accredited, totals.registered);
   const leaderShare = percent(leader.votes, totals.valid);
+  const displayFont = '"Segoe UI Variable Display", "Aptos Display", "Bahnschrift", system-ui';
+  const textFont = '"Aptos", "Segoe UI", system-ui';
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const gradient = ctx.createLinearGradient(0, 0, 1400, 1800);
-  gradient.addColorStop(0, "#071014");
-  gradient.addColorStop(0.42, "#10292c");
-  gradient.addColorStop(1, "#f8fbfa");
+  gradient.addColorStop(0, "#061214");
+  gradient.addColorStop(0.38, "#102c2f");
+  gradient.addColorStop(0.72, "#eff7f6");
+  gradient.addColorStop(1, "#ffffff");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 1400, 1800);
 
-  ctx.fillStyle = "rgba(39, 185, 211, 0.18)";
+  ctx.fillStyle = "rgba(39, 185, 211, 0.20)";
   ctx.beginPath();
   ctx.arc(1180, 190, 250, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "rgba(216, 151, 32, 0.16)";
+  ctx.fillStyle = "rgba(216, 151, 32, 0.18)";
   ctx.beginPath();
   ctx.arc(190, 1160, 320, 0, Math.PI * 2);
   ctx.fill();
 
+  if (state.logo) {
+    ctx.save();
+    ctx.globalAlpha = 0.16;
+    ctx.drawImage(state.logo, 350, 455, 700, 700);
+    ctx.restore();
+  }
+
   ctx.save();
-  ctx.translate(700, 940);
-  ctx.rotate(-0.36);
+  ctx.translate(700, 1010);
+  ctx.rotate(-0.3);
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
-  ctx.font = "900 118px system-ui";
+  ctx.fillStyle = "rgba(255,255,255,0.12)";
+  ctx.font = `900 130px ${displayFont}`;
   ctx.fillText("AFRICA DATA WAREHOUSE", 0, 0);
   ctx.restore();
 
   if (state.logo) ctx.drawImage(state.logo, 70, 70, 94, 94);
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
-  ctx.font = "800 34px system-ui";
+  ctx.font = `850 36px ${displayFont}`;
   ctx.fillText("Africa Data Warehouse", 184, 112);
   ctx.fillStyle = "rgba(255,255,255,0.72)";
-  ctx.font = "500 22px system-ui";
+  ctx.font = `500 22px ${textFont}`;
   ctx.fillText("Election Intelligence Result Card", 184, 148);
 
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(255,255,255,0.84)";
-  ctx.font = "800 24px system-ui";
+  ctx.font = `850 24px ${displayFont}`;
   ctx.fillText(scope.level.toUpperCase(), 1320, 104);
-  ctx.font = "500 20px system-ui";
+  ctx.font = `500 20px ${textFont}`;
   ctx.fillText(new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }), 1320, 138);
 
   ctx.textAlign = "left";
   ctx.fillStyle = "#ffffff";
-  ctx.font = "900 70px system-ui";
+  ctx.font = `900 74px ${displayFont}`;
   wrapText(ctx, scope.title, 72, 280, 850, 78, 2);
   ctx.fillStyle = "rgba(255,255,255,0.74)";
-  ctx.font = "500 26px system-ui";
+  ctx.font = `500 27px ${textFont}`;
   wrapText(ctx, scope.subtitle, 76, 430, 900, 34, 2);
 
   const leaderColor = partyColor(leader.party);
   ctx.fillStyle = "#ffffff";
-  drawRoundRect(ctx, 72, 530, 1256, 520, 38);
+  drawRoundRect(ctx, 72, 520, 1256, 500, 40);
   ctx.fill();
-  ctx.fillStyle = "#f2f7f7";
-  drawRoundRect(ctx, 98, 556, 1204, 468, 30);
+  const leaderPanel = ctx.createLinearGradient(98, 546, 1302, 996);
+  leaderPanel.addColorStop(0, "#ffffff");
+  leaderPanel.addColorStop(1, "#eef7f6");
+  ctx.fillStyle = leaderPanel;
+  drawRoundRect(ctx, 98, 546, 1204, 448, 32);
   ctx.fill();
+  ctx.strokeStyle = "rgba(22,35,38,0.08)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
 
   ctx.fillStyle = leaderColor;
   ctx.beginPath();
-  ctx.arc(278, 760, 132, 0, Math.PI * 2);
+  ctx.arc(278, 748, 132, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
-  ctx.font = "900 64px system-ui";
-  ctx.fillText(leader.party, 278, 780);
+  ctx.font = `900 66px ${displayFont}`;
+  ctx.fillText(leader.party, 278, 770);
 
   ctx.textAlign = "left";
-  ctx.fillStyle = "#607174";
-  ctx.font = "800 24px system-ui";
-  ctx.fillText("LEADING PARTY", 460, 650);
+  ctx.fillStyle = "#5d7073";
+  ctx.font = `850 24px ${displayFont}`;
+  ctx.fillText("LEADING PARTY", 460, 638);
   ctx.fillStyle = "#162326";
-  ctx.font = "900 108px system-ui";
-  ctx.fillText(leader.party, 460, 760);
+  ctx.font = `950 116px ${displayFont}`;
+  ctx.fillText(leader.party, 460, 754);
   ctx.fillStyle = leaderColor;
-  ctx.font = "900 74px system-ui";
-  ctx.fillText(fmt(leader.votes), 460, 850);
-  ctx.fillStyle = "#607174";
-  ctx.font = "600 28px system-ui";
-  ctx.fillText(`${leaderShare} of valid votes`, 460, 895);
+  ctx.font = `950 88px ${displayFont}`;
+  ctx.fillText(fmt(leader.votes), 460, 852);
+  ctx.fillStyle = "#5d7073";
+  ctx.font = `650 29px ${textFont}`;
+  ctx.fillText(`${leaderShare} of valid votes`, 460, 900);
 
   ctx.fillStyle = "#162326";
-  ctx.font = "800 30px system-ui";
-  ctx.fillText(`Lead margin: ${fmt(leadMargin)}`, 460, 958);
-  ctx.fillStyle = "#607174";
-  ctx.font = "500 23px system-ui";
-  ctx.fillText(`Runner-up: ${runnerUp.party} (${fmt(runnerUp.votes)})`, 460, 994);
+  ctx.font = `850 31px ${displayFont}`;
+  ctx.fillText(`Lead margin: ${fmt(leadMargin)}`, 460, 956);
+  ctx.fillStyle = "#5d7073";
+  ctx.font = `550 24px ${textFont}`;
+  ctx.fillText(`Runner-up: ${runnerUp.party} (${fmt(runnerUp.votes)})`, 460, 990);
 
   const metricCards = [
     ["Valid Votes", fmt(totals.valid), "#162326"],
@@ -660,40 +676,69 @@ function drawNumberCard(rows, totals) {
     ctx.fillStyle = "#ffffff";
     drawRoundRect(ctx, x, y, 390, 142, 24);
     ctx.fill();
+    ctx.strokeStyle = "rgba(22,35,38,0.08)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
     ctx.fillStyle = metric[2];
-    ctx.font = "900 42px system-ui";
+    ctx.font = `900 44px ${displayFont}`;
     ctx.textAlign = "left";
     ctx.fillText(metric[1], x + 28, y + 68);
-    ctx.fillStyle = "#607174";
-    ctx.font = "800 19px system-ui";
+    ctx.fillStyle = "#5d7073";
+    ctx.font = `850 19px ${displayFont}`;
     ctx.fillText(metric[0].toUpperCase(), x + 28, y + 108);
   });
 
-  const maxVotes = Math.max(...parties.map((item) => item.votes), 1);
+  const maxVotes = Math.max(...allParties.map((item) => item.votes), 1);
+  ctx.fillStyle = "#ffffff";
+  drawRoundRect(ctx, 72, 1452, 1256, 240, 26);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(22,35,38,0.10)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
   ctx.fillStyle = "#162326";
-  ctx.font = "900 30px system-ui";
-  ctx.fillText("TOP PARTY TOTALS", 72, 1512);
-  parties.forEach((item, index) => {
-    const y = 1570 + index * 42;
+  ctx.textAlign = "left";
+  ctx.font = `900 30px ${displayFont}`;
+  ctx.fillText("ALL PARTY RESULTS", 104, 1508);
+
+  const columns = 2;
+  const rowsPerColumn = Math.ceil(allParties.length / columns) || 1;
+  const rowHeight = Math.max(22, Math.min(34, Math.floor(150 / rowsPerColumn)));
+  const rowFont = rowHeight < 26 ? 18 : 21;
+  allParties.forEach((item, index) => {
+    const col = index >= rowsPerColumn ? 1 : 0;
+    const row = index % rowsPerColumn;
+    const x = 104 + col * 610;
+    const y = 1554 + row * rowHeight;
     const color = partyColor(item.party, index);
-    ctx.fillStyle = color;
-    ctx.font = "900 24px system-ui";
-    ctx.fillText(item.party, 72, y);
-    ctx.fillStyle = "rgba(22,35,38,0.12)";
-    drawRoundRect(ctx, 190, y - 25, 760, 18, 9);
+    ctx.fillStyle = index % 2 === 0 ? "rgba(22,35,38,0.035)" : "rgba(22,35,38,0.015)";
+    drawRoundRect(ctx, x - 10, y - 20, 560, rowHeight - 3, 8);
     ctx.fill();
     ctx.fillStyle = color;
-    drawRoundRect(ctx, 190, y - 25, 760 * (item.votes / maxVotes), 18, 9);
+    ctx.font = `900 ${rowFont}px ${displayFont}`;
+    ctx.textAlign = "left";
+    ctx.fillText(item.party, x, y);
+    ctx.fillStyle = "rgba(22,35,38,0.13)";
+    drawRoundRect(ctx, x + 78, y - 16, 300, 12, 6);
+    ctx.fill();
+    ctx.fillStyle = color;
+    drawRoundRect(ctx, x + 78, y - 16, 300 * (item.votes / maxVotes), 12, 6);
     ctx.fill();
     ctx.fillStyle = "#162326";
     ctx.textAlign = "right";
-    ctx.font = "800 24px system-ui";
-    ctx.fillText(fmt(item.votes), 1294, y);
+    ctx.font = `850 ${rowFont}px ${displayFont}`;
+    ctx.fillText(fmt(item.votes), x + 540, y);
     ctx.textAlign = "left";
   });
 
-  ctx.fillStyle = "#607174";
-  ctx.font = "500 20px system-ui";
+  if (!allParties.length) {
+    ctx.fillStyle = "#5d7073";
+    ctx.font = `600 24px ${textFont}`;
+    ctx.fillText("No party votes recorded for this selection yet.", 104, 1570);
+  }
+
+  ctx.fillStyle = "#5d7073";
+  ctx.font = `500 20px ${textFont}`;
   ctx.fillText("Source: INEC IReV public result uploads. Generated by Africa Data Warehouse.", 72, 1740);
   ctx.textAlign = "right";
   ctx.fillText("africadatawarehouse.org", 1328, 1740);

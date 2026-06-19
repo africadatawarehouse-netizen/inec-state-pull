@@ -43,6 +43,21 @@
         </label>
       </section>
 
+      <section class="upload-progress" aria-label="Polling unit upload progress">
+        <div class="progress-copy">
+          <span>PU Results Upload Progress</span>
+          <strong id="uploadProgressText">0 of 0 uploaded</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="uploadProgressFill" class="progress-fill"></div>
+        </div>
+        <div class="progress-stats">
+          <div><span>Total PUs</span><strong id="totalPuCount">0</strong></div>
+          <div><span>Uploaded</span><strong id="uploadedPuCount">0</strong></div>
+          <div><span>Uploaded %</span><strong id="uploadedPuPercent">0.0%</strong></div>
+        </div>
+      </section>
+
       <section class="summary-grid" aria-label="Headline totals">
         <article>
           <span>Total Registered</span>

@@ -71,6 +71,11 @@ const els = {
   accreditedTotal: document.querySelector("#accreditedTotal"),
   validTotal: document.querySelector("#validTotal"),
   puTotal: document.querySelector("#puTotal"),
+  uploadProgressText: document.querySelector("#uploadProgressText"),
+  uploadProgressFill: document.querySelector("#uploadProgressFill"),
+  totalPuCount: document.querySelector("#totalPuCount"),
+  uploadedPuCount: document.querySelector("#uploadedPuCount"),
+  uploadedPuPercent: document.querySelector("#uploadedPuPercent"),
   scopeTitle: document.querySelector("#scopeTitle"),
   scopeSubtitle: document.querySelector("#scopeSubtitle"),
   partyChart: document.querySelector("#partyChart"),
@@ -192,6 +197,25 @@ function sortedParties(totals) {
     .map(([party, votes]) => ({ party, votes }))
     .filter((item) => item.votes > 0)
     .sort((a, b) => b.votes - a.votes || a.party.localeCompare(b.party));
+}
+
+function hasUploadedResult(row) {
+  const fields = ["Image URL", "Image File", "Result Updated Time", "Result Info PU"];
+  return fields.some((field) => {
+    const value = String(row[field] || "").trim().toLowerCase();
+    return value && value !== "nan" && value !== "none" && value !== "null";
+  });
+}
+
+function renderUploadProgress(rows) {
+  const total = rows.length;
+  const uploaded = rows.filter(hasUploadedResult).length;
+  const uploadedPercent = total ? (uploaded / total) * 100 : 0;
+  els.uploadProgressText.textContent = `${uploaded.toLocaleString()} of ${total.toLocaleString()} uploaded`;
+  els.uploadProgressFill.style.width = `${Math.min(uploadedPercent, 100).toFixed(2)}%`;
+  els.totalPuCount.textContent = total.toLocaleString();
+  els.uploadedPuCount.textContent = uploaded.toLocaleString();
+  els.uploadedPuPercent.textContent = `${uploadedPercent.toFixed(1)}%`;
 }
 
 function fillSelect(select, values, current = "All") {
@@ -818,6 +842,7 @@ function downloadPreviewCard() {
 function render() {
   refreshFilters();
   const rows = getFilteredRows();
+  renderUploadProgress(rows);
   const totals = renderSummary(rows);
   renderChart(totals);
   renderPartyList(totals);

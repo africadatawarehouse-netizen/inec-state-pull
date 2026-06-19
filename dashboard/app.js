@@ -81,9 +81,7 @@ const els = {
   puDetail: document.querySelector("#puDetail"),
   documentStatus: document.querySelector("#documentStatus"),
   viewCardBtn: document.querySelector("#viewCardBtn"),
-  downloadCardBtn: document.querySelector("#downloadCardBtn"),
   viewNumberCardBtn: document.querySelector("#viewNumberCardBtn"),
-  downloadNumberCardBtn: document.querySelector("#downloadNumberCardBtn"),
   cardCanvas: document.querySelector("#cardCanvas"),
   numberCardCanvas: document.querySelector("#numberCardCanvas"),
   cardPreviewModal: document.querySelector("#cardPreviewModal"),
@@ -91,6 +89,8 @@ const els = {
   cardPreviewImage: document.querySelector("#cardPreviewImage"),
   closeCardPreviewBtn: document.querySelector("#closeCardPreviewBtn"),
   downloadPreviewCardBtn: document.querySelector("#downloadPreviewCardBtn"),
+  loginPromptModal: document.querySelector("#loginPromptModal"),
+  closeLoginPromptBtn: document.querySelector("#closeLoginPromptBtn"),
 };
 
 let previewCardType = "number";
@@ -799,6 +799,16 @@ function closeCardPreview() {
   document.body.style.overflow = "";
 }
 
+function showLoginPrompt() {
+  els.loginPromptModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeLoginPrompt() {
+  els.loginPromptModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
 function downloadPreviewCard() {
   const canvas = renderCardCanvas(previewCardType);
   const suffix = previewCardType === "number" ? "number_card" : "result_card";
@@ -825,8 +835,8 @@ async function loadStateData(stateKey) {
   state.selectedState = stateKey;
   const config = STATES[stateKey];
   els.pageTitle.textContent = config.title;
-  els.excelDownload.href = config.excelUrl;
-  els.csvDownload.href = config.csvUrl;
+  els.excelDownload.dataset.protectedUrl = config.excelUrl;
+  els.csvDownload.dataset.protectedUrl = config.csvUrl;
   els.stateSelect.value = stateKey;
 
   const csvText = await fetch(`${config.dataUrl}?v=${Date.now()}`).then((res) => {
@@ -858,16 +868,27 @@ els.lgaSelect.addEventListener("change", () => render());
 els.wardSelect.addEventListener("change", () => render());
 els.puSelect.addEventListener("change", () => render());
 els.viewCardBtn.addEventListener("click", () => viewCard("report"));
-els.downloadCardBtn.addEventListener("click", downloadCard);
 els.viewNumberCardBtn.addEventListener("click", () => viewCard("number"));
-els.downloadNumberCardBtn.addEventListener("click", downloadNumberCard);
 els.closeCardPreviewBtn.addEventListener("click", closeCardPreview);
 els.downloadPreviewCardBtn.addEventListener("click", downloadPreviewCard);
+els.excelDownload.addEventListener("click", (event) => {
+  event.preventDefault();
+  showLoginPrompt();
+});
+els.csvDownload.addEventListener("click", (event) => {
+  event.preventDefault();
+  showLoginPrompt();
+});
 els.cardPreviewModal.addEventListener("click", (event) => {
   if (event.target === els.cardPreviewModal) closeCardPreview();
 });
+els.closeLoginPromptBtn.addEventListener("click", closeLoginPrompt);
+els.loginPromptModal.addEventListener("click", (event) => {
+  if (event.target === els.loginPromptModal) closeLoginPrompt();
+});
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !els.cardPreviewModal.hidden) closeCardPreview();
+  if (event.key === "Escape" && !els.loginPromptModal.hidden) closeLoginPrompt();
 });
 window.addEventListener("resize", () => renderChart(aggregate(getFilteredRows())));
 

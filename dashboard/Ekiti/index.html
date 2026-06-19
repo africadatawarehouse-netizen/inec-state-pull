@@ -17,12 +17,10 @@
           </div>
         </div>
         <div class="toolbar">
-          <button id="viewCardBtn" type="button">View Card</button>
-          <button id="downloadCardBtn" type="button">Download Card</button>
-          <button id="viewNumberCardBtn" type="button">View Number Card</button>
-          <button id="downloadNumberCardBtn" type="button">Download Number Card</button>
-          <a id="excelDownload" href="/output/FCT/results.xlsx" download>Excel</a>
-          <a id="csvDownload" href="/output/FCT/pu_results.csv" download>CSV</a>
+          <button id="viewNumberCardBtn" class="action-primary" type="button">View Number Card</button>
+          <button id="viewCardBtn" class="action-secondary" type="button">View Card</button>
+          <a id="excelDownload" class="action-protected" href="#" role="button">Excel</a>
+          <a id="csvDownload" class="action-protected" href="#" role="button">CSV</a>
         </div>
       </header>
 
@@ -114,6 +112,18 @@
         </div>
         <div class="modal-actions">
           <button id="downloadPreviewCardBtn" type="button">Download</button>
+        </div>
+      </div>
+    </div>
+    <div id="loginPromptModal" class="modal" hidden>
+      <div class="login-panel">
+        <div class="modal-head">
+          <h2>Login Required</h2>
+          <button id="closeLoginPromptBtn" type="button">Close</button>
+        </div>
+        <div class="login-copy">
+          <strong>Data exports are restricted.</strong>
+          <p>Please log in or request access from Africa Data Warehouse to download the Excel or CSV files.</p>
         </div>
       </div>
     </div>

@@ -88,18 +88,28 @@ h2 {
 .toolbar a,
 .toolbar button {
   min-height: 38px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(24, 32, 34, 0.28);
   border-radius: 6px;
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 9px 13px;
   text-decoration: none;
+  font-weight: 800;
 }
 
-.toolbar button {
-  background: var(--ink);
-  border-color: var(--ink);
+.toolbar .action-primary {
+  background: var(--teal);
+  color: #071014;
+}
+
+.toolbar .action-secondary {
+  background: var(--amber);
+  color: #14100a;
+}
+
+.toolbar .action-protected {
+  background: #1f7a4d;
   color: white;
 }
 
@@ -307,7 +317,8 @@ th {
   background: rgba(10, 18, 20, 0.72);
 }
 
-.modal-panel {
+.modal-panel,
+.login-panel {
   width: min(960px, 100%);
   max-height: min(94vh, 980px);
   display: grid;
@@ -317,6 +328,10 @@ th {
   background: var(--panel);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
   overflow: hidden;
+}
+
+.login-panel {
+  width: min(520px, 100%);
 }
 
 .modal-head,
@@ -337,12 +352,33 @@ th {
 
 .modal button {
   min-height: 38px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(24, 32, 34, 0.28);
   border-radius: 6px;
-  background: var(--ink);
-  color: white;
+  background: var(--teal);
+  color: #071014;
   cursor: pointer;
+  font-weight: 800;
   padding: 8px 12px;
+}
+
+.modal-head button {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.login-copy {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+}
+
+.login-copy strong {
+  font-size: 20px;
+}
+
+.login-copy p {
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .preview-frame {

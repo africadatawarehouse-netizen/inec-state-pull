@@ -274,6 +274,13 @@ function refreshFilters(changed) {
   );
 }
 
+function syncPuSelects(value) {
+  els.puSelect.value = value;
+  document.querySelectorAll("[data-detail-pu-select]").forEach((select) => {
+    select.value = value;
+  });
+}
+
 function selectedPuRow() {
   const pu = els.puSelect.value;
   if (pu === "All") return null;
@@ -405,12 +412,23 @@ function renderPuDetail(rows) {
   const pu = selectedPuRow();
   if (!pu) {
     els.documentStatus.textContent = "Select a polling unit to view details";
+    const detailOptions = els.puSelect.innerHTML;
     els.puDetail.innerHTML = `
       <div class="detail-empty">
         <strong>Select a polling unit</strong>
-        <p>Use the Polling Unit dropdown above to choose a specific PU and this section will show the result sheet, vote metadata, and PU-level details.</p>
+        <p>Choose a specific PU here to show the result sheet, vote metadata, and PU-level details.</p>
+        <label class="detail-select-label">
+          Polling Unit
+          <select data-detail-pu-select>${detailOptions}</select>
+        </label>
       </div>
     `;
+    const detailSelect = els.puDetail.querySelector("[data-detail-pu-select]");
+    detailSelect.value = els.puSelect.value;
+    detailSelect.addEventListener("change", () => {
+      syncPuSelects(detailSelect.value);
+      render();
+    });
     return;
   }
   const row = pu;
@@ -914,7 +932,10 @@ els.stateSelect.addEventListener("change", async () => {
 });
 els.lgaSelect.addEventListener("change", () => render());
 els.wardSelect.addEventListener("change", () => render());
-els.puSelect.addEventListener("change", () => render());
+els.puSelect.addEventListener("change", () => {
+  syncPuSelects(els.puSelect.value);
+  render();
+});
 els.viewCardBtn.addEventListener("click", () => viewCard("report"));
 els.viewNumberCardBtn.addEventListener("click", () => viewCard("number"));
 els.closeCardPreviewBtn.addEventListener("click", closeCardPreview);

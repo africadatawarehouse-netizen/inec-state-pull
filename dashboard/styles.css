@@ -383,6 +383,16 @@ th {
   line-height: 1.5;
 }
 
+.detail-select-label {
+  margin-top: 14px;
+  text-align: left;
+}
+
+.detail-select-label select {
+  margin-top: 6px;
+  text-transform: none;
+}
+
 .modal[hidden] {
   display: none;
 }

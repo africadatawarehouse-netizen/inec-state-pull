@@ -1,6 +1,7 @@
 import argparse
 import re
 import sqlite3
+import subprocess
 import time
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -107,6 +108,24 @@ def spool_state_once(state_name, irev_url, date_prefix=None, download_files=Fals
     print(f"{state_name}: wrote {len(df)} PU row(s).")
 
 
+def publish_state_outputs(state_name):
+    paths = [
+        f"output/{state_name}",
+        "README.md",
+    ]
+    subprocess.run(["git", "add", *paths], check=True)
+    diff = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if diff.returncode == 0:
+        print("No output changes to publish.")
+        return
+
+    message = f"Refresh {state_name} live results"
+    subprocess.run(["git", "commit", "-m", message], check=True)
+    subprocess.run(["git", "push"], check=True)
+    subprocess.run(["npx", "vercel", "--prod", "--yes"], check=True)
+    print(f"Published {state_name} outputs to Vercel.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Live spooler for a state election from an INEC IReV URL.")
     parser.add_argument("--state", required=True, choices=sorted(STATE_ROUTES.values()))
@@ -114,10 +133,13 @@ def main():
     parser.add_argument("--date-prefix", help="Optional date prefix such as 2026-06-20")
     parser.add_argument("--interval", type=int, default=0, help="Repeat every N seconds. Use 0 for one run.")
     parser.add_argument("--download-files", action="store_true", help="Download result sheets locally.")
+    parser.add_argument("--deploy", action="store_true", help="Commit, push, and redeploy Vercel after each successful scrape.")
     args = parser.parse_args()
 
     while True:
         spool_state_once(args.state, args.irev_url, args.date_prefix, download_files=args.download_files)
+        if args.deploy:
+            publish_state_outputs(args.state)
         if not args.interval:
             break
         print(f"Sleeping {args.interval} seconds...")

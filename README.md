@@ -43,16 +43,16 @@ python full_results_downloader.py --election-id 6998247c6a7216db79726383 --no-do
 When the Ekiti or Osun IReV election type URL is available, run:
 
 ```powershell
-python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-06-20 --interval 300
+python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-06-20 --interval 300 --deploy
 ```
 
 For Osun:
 
 ```powershell
-python live_state_spooler.py --state Osun --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-08-15 --interval 300
+python live_state_spooler.py --state Osun --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-08-15 --interval 300 --deploy
 ```
 
-Use `--download-files` if local result-sheet downloads are also needed.
+Use `--download-files` if local result-sheet downloads are also needed. The `--deploy` flag commits the updated output files, pushes them to GitHub, and redeploys Vercel after each scrape.
 
 ## Generated Outputs
 

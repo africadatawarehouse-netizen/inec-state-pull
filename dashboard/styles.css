@@ -80,15 +80,15 @@ p {
 
 h1 {
   font-family: var(--header-font);
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 29px;
+  font-weight: 900;
   line-height: 1.15;
 }
 
 h2 {
   font-family: var(--header-font);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .toolbar {
@@ -108,7 +108,8 @@ h2 {
   cursor: pointer;
   padding: 9px 13px;
   text-decoration: none;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .toolbar .action-primary {
@@ -178,8 +179,8 @@ select {
   display: block;
   margin-top: 5px;
   font-family: var(--header-font);
-  font-weight: 700;
-  font-size: 21px;
+  font-weight: 900;
+  font-size: 24px;
 }
 
 .progress-track {
@@ -213,8 +214,8 @@ select {
   display: block;
   margin-top: 5px;
   font-family: var(--header-font);
-  font-weight: 700;
-  font-size: 20px;
+  font-weight: 900;
+  font-size: 23px;
 }
 
 .summary-grid {
@@ -248,8 +249,8 @@ select {
   display: block;
   margin-top: 8px;
   font-family: var(--header-font);
-  font-weight: 700;
-  font-size: 28px;
+  font-weight: 900;
+  font-size: 32px;
 }
 
 .workspace {
@@ -304,7 +305,8 @@ select {
 
 .party-code {
   font-family: var(--header-font);
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 900;
 }
 
 .bar-track {
@@ -321,7 +323,8 @@ select {
 
 .party-votes {
   font-family: var(--header-font);
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 900;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -383,7 +386,8 @@ th {
   margin-top: 4px;
   color: var(--ink);
   font-family: var(--header-font);
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 900;
   overflow-wrap: anywhere;
   text-decoration-color: var(--teal);
 }
@@ -399,8 +403,8 @@ th {
 .detail-empty strong {
   display: block;
   font-family: var(--header-font);
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 900;
+  font-size: 21px;
 }
 
 .detail-empty p {

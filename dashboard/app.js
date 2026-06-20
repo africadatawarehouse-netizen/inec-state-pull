@@ -105,6 +105,8 @@ const metaColumns = new Set([
 const state = {
   selectedState: "FCT",
   rows: [],
+  lgaSummaryRows: [],
+  lgaSummaryByName: new Map(),
   partyColumns: [],
   logo: null,
   mapData: null,
@@ -230,6 +232,21 @@ function getFilteredRows() {
     if (pu !== "All" && row["PU Code"] !== pu) return false;
     return true;
   });
+}
+
+function lgaUploadStats(lga, items) {
+  const summary = state.lgaSummaryByName.get(normalizeName(lga));
+  const endpointUploaded = summary ? num(summary["INEC Uploaded Results"]) : 0;
+  const endpointExpected = summary ? num(summary["Polling Units"]) : 0;
+  const localUploaded = items.filter(hasUploadedResult).length;
+  const expected = endpointExpected || items.length;
+  const uploaded = summary && "INEC Uploaded Results" in summary ? endpointUploaded : localUploaded;
+  return {
+    uploaded,
+    expected,
+    percent: expected ? (uploaded / expected) * 100 : 0,
+    source: summary && "INEC Uploaded Results" in summary ? "INEC" : "Local",
+  };
 }
 
 function aggregate(rows) {
@@ -448,13 +465,14 @@ function renderLgaTable() {
   const rows = [...grouped.entries()].map(([lga, items]) => {
     const totals = aggregate(items);
     const leader = sortedParties(totals)[0];
-    return { lga, items, totals, leader };
+    const upload = lgaUploadStats(lga, items);
+    return { lga, items, totals, leader, upload };
   });
   rows.sort((a, b) => a.lga.localeCompare(b.lga));
   els.lgaCount.textContent = `${rows.length} LGA${rows.length === 1 ? "" : "s"}`;
   els.lgaTable.innerHTML = `
     <table>
-      <thead><tr><th>LGA</th><th>Election</th><th>PU</th><th>Accredited</th><th>Valid</th><th>Leader</th></tr></thead>
+      <thead><tr><th>LGA</th><th>Election</th><th>PU</th><th>Uploaded</th><th>Accredited</th><th>Valid</th><th>Leader</th></tr></thead>
       <tbody>
         ${rows
           .map(
@@ -463,6 +481,7 @@ function renderLgaTable() {
                 <td>${row.lga}</td>
                 <td>${electionLabel(row.items)}</td>
                 <td>${row.items.length.toLocaleString()}</td>
+                <td>${row.upload.uploaded.toLocaleString()} / ${row.upload.expected.toLocaleString()} (${row.upload.percent.toFixed(0)}%)</td>
                 <td>${fmt(row.totals.accredited)}</td>
                 <td>${fmt(row.totals.valid)}</td>
                 <td>${row.leader ? `${row.leader.party} ${fmt(row.leader.votes)}` : ""}</td>
@@ -639,8 +658,8 @@ function renderMap() {
   grouped.forEach((items, key) => {
     const totals = aggregate(items);
     const leader = sortedParties(totals)[0] || { party: "No data", votes: 0 };
-    const uploaded = items.filter(hasUploadedResult).length;
-    stats.set(key, { items, totals, leader, uploaded });
+    const upload = lgaUploadStats(items[0]?.LGA || key, items);
+    stats.set(key, { items, totals, leader, upload });
   });
 
   const selectedLga = normalizeName(els.lgaSelect.value);
@@ -700,12 +719,11 @@ function renderMap() {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([key, item], index) => {
       const lga = item.items[0]?.LGA || key;
-      const percentUploaded = item.items.length ? (item.uploaded / item.items.length) * 100 : 0;
       return `
         <div class="legend-item">
           <span class="legend-swatch" style="background:${partyColor(item.leader.party, index)}"></span>
           <strong>${lga}</strong>
-          <span>${item.leader.party} - ${percentUploaded.toFixed(0)}%</span>
+          <span>${item.leader.party} - ${item.upload.percent.toFixed(0)}% uploaded</span>
         </div>
       `;
     })
@@ -1151,6 +1169,13 @@ async function loadStateData(stateKey, options = {}) {
     return res.text();
   });
   state.rows = parseCsv(csvText);
+  state.lgaSummaryRows = await fetch(`/output/${stateKey}/lga_summary.csv?v=${Date.now()}`)
+    .then((res) => (res.ok ? res.text() : ""))
+    .then((text) => (text ? parseCsv(text) : []))
+    .catch(() => []);
+  state.lgaSummaryByName = new Map(
+    state.lgaSummaryRows.map((row) => [normalizeName(row.LGA), row]),
+  );
   state.partyColumns = Object.keys(state.rows[0] || {}).filter((key) => !metaColumns.has(key));
 
   if (!state.mapData) {

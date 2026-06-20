@@ -290,15 +290,40 @@ function hasUploadedResult(row) {
   });
 }
 
+function hasVoteFigures(row) {
+  return state.partyColumns.some((party) => num(row[party]) > 0) || num(row["Valid Votes"]) > 0;
+}
+
+function ensureProgressStat(id, label) {
+  let valueEl = document.querySelector(`#${id}`);
+  if (valueEl) return valueEl;
+
+  const stat = document.createElement("div");
+  const labelEl = document.createElement("span");
+  valueEl = document.createElement("strong");
+  labelEl.textContent = label;
+  valueEl.id = id;
+  valueEl.textContent = "0";
+  stat.append(labelEl, valueEl);
+  document.querySelector(".progress-stats").appendChild(stat);
+  return valueEl;
+}
+
 function renderUploadProgress(rows) {
   const total = rows.length;
   const uploaded = rows.filter(hasUploadedResult).length;
+  const voteFigureRows = rows.filter(hasVoteFigures).length;
   const uploadedPercent = total ? (uploaded / total) * 100 : 0;
+  const voteFigurePercent = total ? (voteFigureRows / total) * 100 : 0;
+  const voteFigureCountEl = ensureProgressStat("voteFigurePuCount", "PUs with Figures");
+  const voteFigurePercentEl = ensureProgressStat("voteFigurePuPercent", "Figures %");
   els.uploadProgressText.textContent = `${uploaded.toLocaleString()} of ${total.toLocaleString()} uploaded`;
   els.uploadProgressFill.style.width = `${Math.min(uploadedPercent, 100).toFixed(2)}%`;
   els.totalPuCount.textContent = total.toLocaleString();
   els.uploadedPuCount.textContent = uploaded.toLocaleString();
   els.uploadedPuPercent.textContent = `${uploadedPercent.toFixed(1)}%`;
+  voteFigureCountEl.textContent = voteFigureRows.toLocaleString();
+  voteFigurePercentEl.textContent = `${voteFigurePercent.toFixed(1)}%`;
 }
 
 function fillSelect(select, values, current = "All") {

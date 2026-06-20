@@ -64,6 +64,15 @@ python live_state_spooler.py --state Osun --irev-url "https://inecelectionresult
 
 Use `--download-files` if local result-sheet downloads are also needed. The `--deploy` flag commits the updated output files, pushes them to GitHub, and redeploys Vercel after each scrape.
 
+## Ekiti Automatic Refresh
+
+GitHub Actions runs `.github/workflows/ekiti-live-refresh.yml` for the Ekiti live feed:
+
+- Before the first result upload is detected, it checks every 30 minutes.
+- Once at least one result upload is detected, it checks every 10 minutes.
+- It commits changed `output/Ekiti/` files only after uploaded results exist, so Vercel can redeploy from GitHub without needing a local computer to stay on.
+- It can also be started manually from the GitHub Actions tab with the `Ekiti live refresh` workflow.
+
 ## Generated Outputs
 
 The dashboard reads:

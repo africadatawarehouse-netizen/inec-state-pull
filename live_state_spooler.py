@@ -68,6 +68,13 @@ def write_state_outputs(state_name, df):
     out_dir = Path("output") / state_name
     out_dir.mkdir(parents=True, exist_ok=True)
     df = normalize_numeric_columns(df.copy())
+    sort_columns = [
+        col
+        for col in ["State", "LGA", "Ward", "PU Code", "Polling Unit", "PU ID"]
+        if col in df.columns
+    ]
+    if sort_columns:
+        df = df.sort_values(sort_columns, kind="stable").reset_index(drop=True)
     if df.empty:
         df.to_csv(out_dir / "pu_results.csv", index=False)
         return

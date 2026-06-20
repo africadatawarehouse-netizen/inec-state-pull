@@ -1,0 +1,72 @@
+name: Ekiti live refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ekiti-live-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-ekiti:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: python -m pip install pandas requests openpyxl
+
+      - name: Decide refresh cadence
+        id: cadence
+        shell: bash
+        run: |
+          first_upload_seen="$(python scripts/ekiti_refresh_status.py first-upload-seen)"
+          schedule="${{ github.event.schedule }}"
+          should_run="true"
+
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$schedule" = "*/10 * * * *" ] && [ "$first_upload_seen" != "true" ]; then
+            should_run="false"
+          fi
+
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$schedule" = "*/30 * * * *" ] && [ "$first_upload_seen" = "true" ]; then
+            should_run="false"
+          fi
+
+          echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
+          echo "first_upload_seen=$first_upload_seen" >> "$GITHUB_OUTPUT"
+
+      - name: Refresh Ekiti from INEC
+        if: steps.cadence.outputs.should_run == 'true'
+        run: python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/6a35bb87b4e45d80b33a6e38"
+
+      - name: Record upload status
+        if: steps.cadence.outputs.should_run == 'true'
+        id: status
+        run: python scripts/ekiti_refresh_status.py record
+
+      - name: Commit refreshed Ekiti outputs
+        if: steps.cadence.outputs.should_run == 'true' && steps.status.outputs.uploaded_count != '0'
+        shell: bash
+        run: |
+          git config user.name "Africa Data Warehouse Bot"
+          git config user.email "actions@github.com"
+          git add output/Ekiti
+          if git diff --cached --quiet; then
+            echo "No Ekiti output changes to commit."
+          else
+            git commit -m "Auto-refresh Ekiti live results"
+            git push
+          fi

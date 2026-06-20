@@ -28,12 +28,25 @@ STATE_ROUTES = {
 def parse_irev_url(url):
     parsed = urlparse(url)
     query = parse_qs(parsed.query)
+
+    direct_match = re.search(r"/elections/([0-9a-f]{24})/?$", parsed.path)
+    if direct_match:
+        return {
+            "direct_election_ids": [direct_match.group(1)],
+            "election_type_id": None,
+            "state_id": None,
+        }
+
     state_id = query.get("state_id", [None])[0]
     match = re.search(r"/elections/types/([^/?#]+)", parsed.path)
     election_type_id = match.group(1) if match else None
     if not state_id or not election_type_id:
-        raise ValueError("IReV URL must look like /elections/types/<type_id>?state_id=<id>")
-    return election_type_id, int(state_id)
+        raise ValueError("IReV URL must look like /elections/<election_id> or /elections/types/<type_id>?state_id=<id>")
+    return {
+        "direct_election_ids": [],
+        "election_type_id": election_type_id,
+        "state_id": int(state_id),
+    }
 
 
 def normalize_numeric_columns(df):
@@ -82,17 +95,27 @@ def write_state_outputs(state_name, df):
 
 
 def spool_state_once(state_name, irev_url, date_prefix=None, download_files=False):
-    election_type_id, state_id = parse_irev_url(irev_url)
+    irev_target = parse_irev_url(irev_url)
     all_rows = []
     skipped = []
 
     with requests.Session() as session:
         session.headers.update({"User-Agent": "AfricaDataWarehouseResultSpooler/1.0"})
-        elections = discover_elections(session, election_type_id, state_id, election_date_prefix=date_prefix)
-        print(f"Discovered {len(elections)} election(s) for {state_name}.")
-        for election in elections:
-            domain = election.get("domain") or {}
-            print(f"  {domain.get('name', 'Unknown')}: {election.get('_id')}")
+        direct_election_ids = irev_target["direct_election_ids"]
+        if direct_election_ids:
+            elections = [{"_id": election_id, "domain": {"name": state_name}} for election_id in direct_election_ids]
+            print(f"Using {len(elections)} direct election link(s) for {state_name}.")
+        else:
+            elections = discover_elections(
+                session,
+                irev_target["election_type_id"],
+                irev_target["state_id"],
+                election_date_prefix=date_prefix,
+            )
+            print(f"Discovered {len(elections)} election(s) for {state_name}.")
+            for election in elections:
+                domain = election.get("domain") or {}
+                print(f"  {domain.get('name', 'Unknown')}: {election.get('_id')}")
 
         for election in elections:
             rows, skipped_wards = collect_election(session, election["_id"], download_files=download_files)

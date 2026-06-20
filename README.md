@@ -40,7 +40,15 @@ python full_results_downloader.py --election-id 6998247c6a7216db79726383 --no-do
 
 ## Live State Spooling
 
-When the Ekiti or Osun IReV election type URL is available, run:
+When the Ekiti or Osun IReV URL is available, run either the direct election URL or the election type URL.
+
+For Ekiti 2026:
+
+```powershell
+python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/6a35bb87b4e45d80b33a6e38" --interval 300 --deploy
+```
+
+Election type URL format:
 
 ```powershell
 python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/types/<TYPE_ID>?state_id=<STATE_ID>" --date-prefix 2026-06-20 --interval 300 --deploy

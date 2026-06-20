@@ -1,1 +1,17 @@
-State,LGA,Polling Units
+State,LGA,Ballots Issued,Ballots Used,Invalid Votes,Total Accredited,Total Registered,Valid Votes,Polling Units
+Ekiti,ADO EKITI,0,0,0,0,0,0,344
+Ekiti,EFON,0,0,0,0,0,0,119
+Ekiti,EKITI EAST,0,0,0,0,0,0,112
+Ekiti,EKITI SOUTH WEST,0,0,0,0,0,0,188
+Ekiti,EKITI WEST,0,0,0,0,0,0,184
+Ekiti,EMURE,0,0,0,0,0,0,94
+Ekiti,GBONYIN,0,0,0,0,0,0,115
+Ekiti,IDO / OSI,0,0,0,0,0,0,144
+Ekiti,IJERO,0,0,0,0,0,0,145
+Ekiti,IKERE,0,0,0,0,0,0,125
+Ekiti,IKOLE,0,0,0,0,0,0,189
+Ekiti,ILEJEMEJE,0,0,0,0,0,0,91
+Ekiti,IREPODUN / IFELODUN,0,0,0,0,0,0,174
+Ekiti,ISE / ORUN,0,0,0,0,0,0,114
+Ekiti,MOBA,0,0,0,0,0,0,116
+Ekiti,OYE,0,0,0,0,0,0,191

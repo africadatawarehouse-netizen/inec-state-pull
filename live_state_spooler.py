@@ -113,6 +113,7 @@ def spool_state_once(state_name, irev_url, date_prefix=None, download_files=Fals
     skipped = []
 
     with requests.Session() as session:
+        session.trust_env = False
         session.headers.update({"User-Agent": "AfricaDataWarehouseResultSpooler/1.0"})
         direct_election_ids = irev_target["direct_election_ids"]
         if direct_election_ids:

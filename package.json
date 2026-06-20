@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "dev": "python scripts/live_auto_refresh.py --interval 600 --stop-after-idle-hours 10",
+    "refresh:once": "python scripts/live_auto_refresh.py --once"
+  }
+}

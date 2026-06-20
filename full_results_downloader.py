@@ -320,6 +320,7 @@ def fetch_ward_results(election_id, state_name, lga_name, ward, download_files):
         return rows, skipped_ward
 
     with requests.Session() as session:
+        session.trust_env = False
         session.headers.update({"User-Agent": "AfricaDataWarehouseResultSpooler/1.0"})
         print(f"  Ward: {lga_name} / {ward_name}", flush=True)
         pu_url = f"{BASE_URL}/elections/{election_id}/pus?ward={ward_id}"
@@ -404,6 +405,7 @@ def spool_results(election_ids, download_files: bool = True):
     all_skipped_wards = []
 
     with requests.Session() as session:
+        session.trust_env = False
         session.headers.update({"User-Agent": "AfricaDataWarehouseResultSpooler/1.0"})
         for election_id in election_ids:
             rows, skipped_wards = collect_election(session, election_id, download_files=download_files)
@@ -433,6 +435,7 @@ def main():
     args = parser.parse_args()
 
     with requests.Session() as session:
+        session.trust_env = False
         session.headers.update({"User-Agent": "AfricaDataWarehouseResultSpooler/1.0"})
         if args.election_id:
             election_ids = args.election_id

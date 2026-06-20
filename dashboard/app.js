@@ -25,6 +25,54 @@ const STATES = {
     csvUrl: "/output/Osun/pu_results.csv",
     cardSubtitle: "Osun Governorship Election Results",
   },
+  Enugu: {
+    label: "Enugu",
+    title: "Enugu June 20 By-Election Results",
+    dataUrl: "/output/Enugu/pu_results.csv",
+    excelUrl: "/output/Enugu/results.xlsx",
+    csvUrl: "/output/Enugu/pu_results.csv",
+    cardSubtitle: "Enugu June 20 By-Election Results",
+  },
+  Kano: {
+    label: "Kano",
+    title: "Kano June 20 By-Election Results",
+    dataUrl: "/output/Kano/pu_results.csv",
+    excelUrl: "/output/Kano/results.xlsx",
+    csvUrl: "/output/Kano/pu_results.csv",
+    cardSubtitle: "Kano June 20 By-Election Results",
+  },
+  Kebbi: {
+    label: "Kebbi",
+    title: "Kebbi June 20 By-Election Results",
+    dataUrl: "/output/Kebbi/pu_results.csv",
+    excelUrl: "/output/Kebbi/results.xlsx",
+    csvUrl: "/output/Kebbi/pu_results.csv",
+    cardSubtitle: "Kebbi June 20 By-Election Results",
+  },
+  Nasarawa: {
+    label: "Nasarawa",
+    title: "Nasarawa June 20 By-Election Results",
+    dataUrl: "/output/Nasarawa/pu_results.csv",
+    excelUrl: "/output/Nasarawa/results.xlsx",
+    csvUrl: "/output/Nasarawa/pu_results.csv",
+    cardSubtitle: "Nasarawa June 20 By-Election Results",
+  },
+  Ondo: {
+    label: "Ondo",
+    title: "Ondo June 20 By-Election Results",
+    dataUrl: "/output/Ondo/pu_results.csv",
+    excelUrl: "/output/Ondo/results.xlsx",
+    csvUrl: "/output/Ondo/pu_results.csv",
+    cardSubtitle: "Ondo June 20 By-Election Results",
+  },
+  Rivers: {
+    label: "Rivers",
+    title: "Rivers June 20 By-Election Results",
+    dataUrl: "/output/Rivers/pu_results.csv",
+    excelUrl: "/output/Rivers/results.xlsx",
+    csvUrl: "/output/Rivers/pu_results.csv",
+    cardSubtitle: "Rivers June 20 By-Election Results",
+  },
 };
 
 const metaColumns = new Set([
@@ -304,7 +352,7 @@ function renderSummary(rows) {
   if (els.wardSelect.value !== "All") parts.push(els.wardSelect.value);
   if (els.puSelect.value !== "All") parts.push(els.puSelect.selectedOptions[0]?.textContent || els.puSelect.value);
   els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
-  if (!parts.length) els.scopeTitle.textContent = `${state.selectedState} Results`;
+  if (!parts.length) els.scopeTitle.textContent = `${STATES[state.selectedState].label} Results`;
   els.scopeSubtitle.textContent = `${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
   return totals;
 }

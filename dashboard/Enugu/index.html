@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Africa Data Warehouse Elections</title>
+    <link rel="stylesheet" href="/dashboard/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/assets/africa-data-warehouse-logo.png" alt="Africa Data Warehouse">
+          <div>
+            <p class="eyebrow">Africa Data Warehouse</p>
+            <h1 id="pageTitle">State Election Results</h1>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="viewNumberCardBtn" class="action-primary" type="button">View Number Card</button>
+          <button id="viewCardBtn" class="action-secondary" type="button">View Card</button>
+          <a id="excelDownload" class="action-protected" href="#" role="button">Excel</a>
+          <a id="csvDownload" class="action-protected" href="#" role="button">CSV</a>
+        </div>
+      </header>
+
+      <section class="filters" aria-label="Result filters">
+        <label>
+          State
+          <select id="stateSelect"></select>
+        </label>
+        <label>
+          LGA
+          <select id="lgaSelect"></select>
+        </label>
+        <label>
+          Ward
+          <select id="wardSelect"></select>
+        </label>
+        <label>
+          Polling Unit
+          <select id="puSelect"></select>
+        </label>
+      </section>
+
+      <section class="upload-progress" aria-label="Polling unit upload progress">
+        <div class="progress-copy">
+          <span>PU Results Upload Progress</span>
+          <strong id="uploadProgressText">0 of 0 uploaded</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="uploadProgressFill" class="progress-fill"></div>
+        </div>
+        <div class="progress-stats">
+          <div><span>Total PUs</span><strong id="totalPuCount">0</strong></div>
+          <div><span>Uploaded</span><strong id="uploadedPuCount">0</strong></div>
+          <div><span>Uploaded %</span><strong id="uploadedPuPercent">0.0%</strong></div>
+        </div>
+      </section>
+
+      <section class="panel map-panel" aria-label="LGA boundary map">
+        <div class="panel-head">
+          <h2>LGA Map</h2>
+          <p id="mapStatus">Click an LGA to drill down</p>
+        </div>
+        <div class="map-layout">
+          <div id="lgaMap" class="lga-map"></div>
+          <div id="mapLegend" class="map-legend"></div>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Headline totals">
+        <article>
+          <span>Total Registered</span>
+          <strong id="registeredTotal">0</strong>
+        </article>
+        <article>
+          <span>Total Accredited</span>
+          <strong id="accreditedTotal">0</strong>
+        </article>
+        <article>
+          <span>Valid Votes</span>
+          <strong id="validTotal">0</strong>
+        </article>
+        <article>
+          <span>Polling Units</span>
+          <strong id="puTotal">0</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="panel chart-panel">
+          <div class="panel-head">
+            <h2 id="scopeTitle">FCT Results</h2>
+            <p id="scopeSubtitle"></p>
+          </div>
+          <canvas id="partyChart" width="900" height="420"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Party Votes</h2>
+            <p id="winnerText"></p>
+          </div>
+          <div id="partyList" class="party-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace bottom">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>LGA Breakdown</h2>
+            <p id="lgaCount"></p>
+          </div>
+          <div id="lgaTable" class="table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Polling Unit Detail</h2>
+            <p id="documentStatus"></p>
+          </div>
+          <div id="puDetail" class="detail-grid"></div>
+        </div>
+      </section>
+
+      <canvas id="cardCanvas" width="1200" height="675" hidden></canvas>
+      <canvas id="numberCardCanvas" width="1440" height="1800" hidden></canvas>
+    </main>
+    <div id="cardPreviewModal" class="modal" hidden>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2 id="cardPreviewTitle">Card Preview</h2>
+          <button id="closeCardPreviewBtn" type="button">Close</button>
+        </div>
+        <div class="preview-frame">
+          <img id="cardPreviewImage" alt="Election result card preview">
+        </div>
+        <div class="modal-actions">
+          <button id="downloadPreviewCardBtn" type="button">Download</button>
+        </div>
+      </div>
+    </div>
+    <div id="loginPromptModal" class="modal" hidden>
+      <div class="login-panel">
+        <div class="modal-head">
+          <h2>Login Required</h2>
+          <button id="closeLoginPromptBtn" type="button">Close</button>
+        </div>
+        <div class="login-copy">
+          <strong>Data exports are restricted.</strong>
+          <p>Please log in or request access from Africa Data Warehouse to download the Excel or CSV files.</p>
+        </div>
+      </div>
+    </div>
+    <script src="/dashboard/app.js"></script>
+  </body>
+</html>

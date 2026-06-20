@@ -7,6 +7,7 @@ Africa Data Warehouse election result spooler and dashboard.
 - FCT: `/dashboard/FCT/`
 - Ekiti: `/dashboard/Ekiti/`
 - Osun: `/dashboard/Osun/`
+- June 20 by-election feeds: `/dashboard/Enugu/`, `/dashboard/Kano/`, `/dashboard/Kebbi/`, `/dashboard/Nasarawa/`, `/dashboard/Ondo/`, `/dashboard/Rivers/`
 - Manual backup feed: `/dashboard/manual/`
 - Local server: `python -m http.server 8080`
 - Local URL: `http://localhost:8080/dashboard/`
@@ -17,6 +18,7 @@ The root dashboard has a state dropdown. State-specific data lives in:
 - `output/FCT/`
 - `output/Ekiti/`
 - `output/Osun/`
+- `output/Enugu/`, `output/Kano/`, `output/Kebbi/`, `output/Nasarawa/`, `output/Ondo/`, `output/Rivers/`
 
 ## Refresh Result Data
 

@@ -5,6 +5,10 @@ __pycache__/
 venv/
 downloads/
 logs/
+output/manual_corrections/**/*.jpg
+output/manual_corrections/**/*.png
+output/manual_corrections/**/*.pdf
+output/manual_corrections/*.js
 .vercel/
 
 .vercel

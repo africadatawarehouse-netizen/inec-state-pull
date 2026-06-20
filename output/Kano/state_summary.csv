@@ -1,2 +1,2 @@
-State,Ballots Issued,Ballots Used,Invalid Votes,Total Accredited,Total Registered,Valid Votes,A,AA,AAC,ADC,ADP,APC,APGA,APM,APP,BP,DLA,LP,NDC,NDP,NNPP,NRM,PDP,PRP,SDP,YP,YPP,ZLP,Polling Units
-Kano,6314,906,6,903,6272,896,0,0,2,0,0,887,0,3,0,0,0,4,0,0,0,0,0,0,0,0,0,0,446
+State,Ballots Issued,Ballots Used,Invalid Votes,Total Accredited,Total Registered,Valid Votes,A,AA,AAC,ADC,ADP,APC,APGA,APM,APP,BP,DLA,LP,NDC,NDP,NNPP,NRM,PDP,PRP,SDP,YP,YPP,ZLP,Polling Units,INEC Uploaded Results,INEC Expected Results,INEC Upload Percent
+Kano,7311,984,6,965,7269,958,0,0,2,0,0,949,0,3,0,0,0,4,0,0,0,0,0,0,0,0,0,0,446,422,446,94.6

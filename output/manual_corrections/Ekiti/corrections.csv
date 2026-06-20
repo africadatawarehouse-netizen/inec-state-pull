@@ -1,0 +1,21 @@
+State,PU Code,Total Registered,Total Accredited,Ballots Issued,Ballots Used,Invalid Votes,Valid Votes,A,AA,AAC,ADC,ADP,APC,APGA,APM,APP,BP,LP,NNPP,NRM,PDP,PRP,SDP,YP,YPP,ZLP,Source Image,Notes
+Ekiti,13/01/01/006,183,142,179,138,1,137,0,0,0,1,1,117,0,0,0,0,0,0,0,18,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_006.jpg,Read from uploaded EC8A sheet; register field faint but legible after crop/contrast.
+Ekiti,13/01/01/007,748,169,752,169,0,169,1,0,0,0,0,162,0,0,0,0,0,0,0,6,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_007.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/012,150,79,150,79,1,75,0,0,0,2,0,60,0,0,0,0,0,0,0,13,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_012.jpg,Read from uploaded EC8A sheet; spoiled ballots are 3 but output schema stores rejected ballots as Invalid Votes.
+Ekiti,13/01/01/013,99,48,99,48,0,48,0,0,0,2,0,46,0,0,0,0,0,0,0,0,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_013.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/014,158,106,158,106,2,104,0,0,0,1,0,101,0,0,0,0,0,0,0,2,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_014.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/004,784,254,785,254,2,252,0,0,0,7,0,238,0,0,0,0,0,0,1,6,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_004.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/005,540,184,540,184,1,183,0,0,0,6,0,170,0,0,0,0,0,0,0,7,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_005.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/006,706,191,706,191,2,189,0,1,0,5,2,166,0,0,0,0,0,0,0,15,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_006.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/008,1708,332,1713,332,4,328,0,0,1,5,0,290,4,0,0,0,0,0,2,26,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_008.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/010,912,276,913,276,4,272,0,0,1,14,1,239,0,0,0,0,0,0,0,17,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_010.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/001,730,222,730,222,10,212,4,0,0,5,1,198,0,0,0,0,0,0,0,4,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_001.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/004,657,150,657,150,3,147,0,0,0,4,0,138,0,0,0,0,0,0,0,5,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_004.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/005,883,216,883,216,3,211,0,0,0,3,0,189,0,0,0,0,0,0,0,19,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_005.jpg,Read from uploaded EC8A sheet; top arithmetic fields have handwritten corrections; party total reconciles to valid votes.
+Ekiti,13/01/01/008,983,209,983,209,5,204,4,0,0,3,0,193,2,0,0,0,0,0,0,2,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_008.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/009,543,128,543,139,12,126,0,0,0,5,1,105,2,0,0,0,0,0,0,13,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_009.jpg,Read from uploaded EC8A sheet; accredited and used-ballot fields appear inconsistent on the sheet; party total reconciles to valid votes.
+Ekiti,13/01/01/011,558,134,558,134,0,134,1,0,0,11,0,118,0,0,0,0,0,0,0,4,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_011.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/01/015,450,142,450,142,1,141,0,0,0,1,0,131,1,0,0,0,1,0,0,7,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_01_015.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/002,736,194,736,196,1,193,0,0,0,5,1,172,0,0,0,0,0,0,0,15,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_002.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/007,677,200,677,200,0,200,0,0,0,1,0,197,0,0,0,0,0,0,0,2,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_007.jpg,Read from uploaded EC8A sheet.
+Ekiti,13/01/02/009,776,200,776,200,1,199,0,0,0,2,0,190,1,0,0,0,0,0,0,6,0,0,0,0,0,output/manual_corrections/Ekiti/13_01_02_009.jpg,Read from uploaded EC8A sheet.

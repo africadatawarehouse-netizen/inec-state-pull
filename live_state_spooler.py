@@ -13,6 +13,7 @@ from full_results_downloader import (
     BASE_URL,
     collect_election,
     discover_elections,
+    get_json,
     make_summary,
     numeric_party_columns,
 )
@@ -70,7 +71,50 @@ def normalize_numeric_columns(df):
     return df
 
 
-def write_state_outputs(state_name, df):
+def add_upload_count_columns(ward_summary, lga_summary, state_summary, upload_counts=None):
+    upload_counts = upload_counts or {}
+    lga_counts = upload_counts.get("lga", {})
+    ward_counts = upload_counts.get("ward", {})
+    total_uploaded = upload_counts.get("state_uploaded")
+    total_expected = upload_counts.get("state_expected")
+    has_endpoint_counts = bool(lga_counts or ward_counts or total_uploaded is not None)
+
+    if not lga_summary.empty:
+        lga_summary["INEC Uploaded Results"] = lga_summary["LGA"].map(lambda lga: int(lga_counts.get(str(lga), 0)))
+        fallback = (not has_endpoint_counts) & lga_summary["INEC Uploaded Results"].eq(0)
+        if fallback.any():
+            lga_summary.loc[fallback, "INEC Uploaded Results"] = lga_summary.loc[fallback, "Polling Units"]
+        lga_summary["INEC Upload Percent"] = (
+            lga_summary["INEC Uploaded Results"] / lga_summary["Polling Units"].replace(0, pd.NA) * 100
+        ).fillna(0).round(1)
+
+    if not ward_summary.empty:
+        ward_summary["INEC Uploaded Results"] = ward_summary.apply(
+            lambda row: int(ward_counts.get((str(row["LGA"]), str(row["Ward"])), 0)),
+            axis=1,
+        )
+        fallback = (not has_endpoint_counts) & ward_summary["INEC Uploaded Results"].eq(0)
+        if fallback.any():
+            ward_summary.loc[fallback, "INEC Uploaded Results"] = ward_summary.loc[fallback, "Polling Units"]
+        ward_summary["INEC Upload Percent"] = (
+            ward_summary["INEC Uploaded Results"] / ward_summary["Polling Units"].replace(0, pd.NA) * 100
+        ).fillna(0).round(1)
+
+    if not state_summary.empty:
+        if total_uploaded is None:
+            total_uploaded = int(lga_summary["INEC Uploaded Results"].sum()) if "INEC Uploaded Results" in lga_summary else 0
+        if not total_expected:
+            total_expected = int(state_summary["Polling Units"].sum()) if "Polling Units" in state_summary else 0
+        state_summary["INEC Uploaded Results"] = int(total_uploaded or 0)
+        state_summary["INEC Expected Results"] = int(total_expected or 0)
+        state_summary["INEC Upload Percent"] = (
+            (state_summary["INEC Uploaded Results"] / state_summary["INEC Expected Results"].replace(0, pd.NA) * 100)
+            .fillna(0)
+            .round(1)
+        )
+
+
+def write_state_outputs(state_name, df, upload_counts=None):
     out_dir = Path("output") / state_name
     out_dir.mkdir(parents=True, exist_ok=True)
     df = normalize_numeric_columns(df.copy())
@@ -88,6 +132,7 @@ def write_state_outputs(state_name, df):
     ward_summary = make_summary(df, ["State", "LGA", "Ward"])
     lga_summary = make_summary(df, ["State", "LGA"])
     state_summary = make_summary(df, ["State"])
+    add_upload_count_columns(ward_summary, lga_summary, state_summary, upload_counts)
 
     df.to_csv(out_dir / "pu_results.csv", index=False)
     ward_summary.to_csv(out_dir / "ward_summary.csv", index=False)
@@ -107,10 +152,58 @@ def write_state_outputs(state_name, df):
         state_summary.to_sql("state_summary", conn, if_exists="replace", index=False)
 
 
+def fetch_upload_counts(session, election_ids):
+    lga_counts = {}
+    ward_counts = {}
+    state_uploaded = 0
+    state_expected = 0
+
+    for election_id in election_ids:
+        payload = get_json(session, f"{BASE_URL}/elections/{election_id}/lga")
+        lga_blocks = payload.get("data") or []
+        result_counts = {str(item.get("_id")): int(item.get("count") or 0) for item in payload.get("results") or []}
+
+        for block in lga_blocks:
+            lga = block.get("lga") or {}
+            lga_id = str(lga.get("_id") or "")
+            lga_name = lga.get("name") or "Unknown LGA"
+            expected = len(block.get("wards") or [])
+            state_expected += sum(len((ward.get("polling_units") or [])) for ward in block.get("wards") or [])
+            uploaded = result_counts.get(lga_id, 0)
+            lga_counts[lga_name] = lga_counts.get(lga_name, 0) + uploaded
+            state_uploaded += uploaded
+
+            if not lga_id:
+                continue
+
+            try:
+                ward_payload = get_json(session, f"{BASE_URL}/elections/{election_id}/lga/{lga_id}")
+            except Exception as exc:
+                print(f"WARNING: failed upload-count lookup for {lga_name}: {exc}", flush=True)
+                continue
+            ward_result_counts = {
+                str(item.get("_id")): int(item.get("count") or 0) for item in ward_payload.get("results") or []
+            }
+            lga_data = ward_payload.get("data") or {}
+            wards = lga_data.get("wards") or block.get("wards") or []
+            for ward in wards:
+                ward_id = str(ward.get("_id") or "")
+                ward_name = ward.get("name") or "Unknown Ward"
+                ward_counts[(lga_name, ward_name)] = ward_counts.get((lga_name, ward_name), 0) + ward_result_counts.get(ward_id, 0)
+
+    return {
+        "lga": lga_counts,
+        "ward": ward_counts,
+        "state_uploaded": state_uploaded,
+        "state_expected": state_expected,
+    }
+
+
 def spool_state_once(state_name, irev_url, date_prefix=None, download_files=False):
     irev_target = parse_irev_url(irev_url)
     all_rows = []
     skipped = []
+    upload_counts = None
 
     with requests.Session() as session:
         session.trust_env = False
@@ -138,8 +231,10 @@ def spool_state_once(state_name, irev_url, date_prefix=None, download_files=Fals
             all_rows.extend(rows)
             skipped.extend(skipped_wards)
 
+        upload_counts = fetch_upload_counts(session, [election["_id"] for election in elections])
+
     df = pd.DataFrame(all_rows)
-    write_state_outputs(state_name, df)
+    write_state_outputs(state_name, df, upload_counts=upload_counts)
     if skipped:
         pd.DataFrame(skipped).to_csv(Path("output") / state_name / "skipped_wards.csv", index=False)
     print(f"{state_name}: wrote {len(df)} PU row(s).")

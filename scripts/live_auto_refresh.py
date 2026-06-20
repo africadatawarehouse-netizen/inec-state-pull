@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from ekiti_refresh_status import record_status
+from scripts.apply_manual_corrections import apply_corrections
 from live_state_spooler import spool_state_once
 
 
@@ -60,6 +61,10 @@ def refresh_once():
         try:
             print(f"\n=== Refreshing {state} ===", flush=True)
             spool_state_once(state, url)
+            corrections_path = Path("output") / "manual_corrections" / state / "corrections.csv"
+            if corrections_path.exists():
+                print(f"Applying audited manual corrections for {state}.", flush=True)
+                apply_corrections(state, corrections_path)
             record_status(state)
         except Exception as exc:
             print(f"WARNING: {state} refresh failed: {exc}", flush=True)

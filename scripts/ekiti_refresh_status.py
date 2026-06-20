@@ -18,6 +18,10 @@ def csv_file(state):
     return Path("output") / state / "pu_results.csv"
 
 
+def state_summary_file(state):
+    return Path("output") / state / "state_summary.csv"
+
+
 def read_status(state):
     path = status_file(state)
     if not path.exists():
@@ -54,6 +58,13 @@ def summarize_results(state):
 
     df = pd.read_csv(path)
     uploaded_count = int(df.apply(has_uploaded_result, axis=1).sum()) if not df.empty else 0
+    summary_path = state_summary_file(state)
+    if summary_path.exists():
+        summary_df = pd.read_csv(summary_path)
+        if not summary_df.empty and "INEC Uploaded Results" in summary_df.columns:
+            endpoint_uploaded = pd.to_numeric(summary_df["INEC Uploaded Results"].iloc[0], errors="coerce")
+            if pd.notna(endpoint_uploaded):
+                uploaded_count = int(endpoint_uploaded)
     max_result_updated_time = ""
     if "Result Updated Time" in df.columns:
         values = [

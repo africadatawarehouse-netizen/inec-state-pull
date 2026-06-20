@@ -105,8 +105,11 @@ const metaColumns = new Set([
 const state = {
   selectedState: "FCT",
   rows: [],
+  stateSummaryRows: [],
   lgaSummaryRows: [],
   lgaSummaryByName: new Map(),
+  wardSummaryRows: [],
+  wardSummaryByKey: new Map(),
   partyColumns: [],
   logo: null,
   mapData: null,
@@ -275,6 +278,43 @@ function aggregate(rows) {
   return totals;
 }
 
+function aggregateFromSummaryRow(row, fallbackRows = []) {
+  if (!row) return aggregate(fallbackRows);
+  const totals = {
+    registered: num(row["Total Registered"]),
+    accredited: num(row["Total Accredited"]),
+    valid: num(row["Valid Votes"]),
+    invalid: num(row["Invalid Votes"]),
+    issued: num(row["Ballots Issued"]),
+    used: num(row["Ballots Used"]),
+    pollingUnits: num(row["Polling Units"]) || fallbackRows.length,
+    parties: {},
+  };
+  state.partyColumns.forEach((party) => {
+    totals.parties[party] = num(row[party]);
+  });
+  return totals;
+}
+
+function summaryKey(lga, ward) {
+  return `${normalizeName(lga)}|${normalizeName(ward)}`;
+}
+
+function summaryRowForScope(rows) {
+  if (els.puSelect.value !== "All") return null;
+  if (els.wardSelect.value !== "All") {
+    return state.wardSummaryByKey.get(summaryKey(els.lgaSelect.value, els.wardSelect.value)) || null;
+  }
+  if (els.lgaSelect.value !== "All") {
+    return state.lgaSummaryByName.get(normalizeName(els.lgaSelect.value)) || null;
+  }
+  return state.stateSummaryRows[0] || null;
+}
+
+function aggregateForScope(rows) {
+  return aggregateFromSummaryRow(summaryRowForScope(rows), rows);
+}
+
 function sortedParties(totals) {
   return Object.entries(totals.parties)
     .map(([party, votes]) => ({ party, votes }))
@@ -310,8 +350,11 @@ function ensureProgressStat(id, label) {
 }
 
 function renderUploadProgress(rows) {
-  const total = rows.length;
-  const uploaded = rows.filter(hasUploadedResult).length;
+  const summaryRow = summaryRowForScope(rows);
+  const total = num(summaryRow?.["Polling Units"] || summaryRow?.["INEC Expected Results"]) || rows.length;
+  const uploaded = summaryRow && "INEC Uploaded Results" in summaryRow
+    ? num(summaryRow["INEC Uploaded Results"])
+    : rows.filter(hasUploadedResult).length;
   const voteFigureRows = rows.filter(hasVoteFigures).length;
   const uploadedPercent = total ? (uploaded / total) * 100 : 0;
   const voteFigurePercent = total ? (voteFigureRows / total) * 100 : 0;
@@ -396,11 +439,11 @@ function selectedPuRow() {
 }
 
 function renderSummary(rows) {
-  const totals = aggregate(rows);
+  const totals = aggregateForScope(rows);
   els.registeredTotal.textContent = fmt(totals.registered);
   els.accreditedTotal.textContent = fmt(totals.accredited);
   els.validTotal.textContent = fmt(totals.valid);
-  els.puTotal.textContent = rows.length.toLocaleString();
+  els.puTotal.textContent = (totals.pollingUnits || rows.length).toLocaleString();
 
   const parts = [];
   if (els.lgaSelect.value !== "All") parts.push(els.lgaSelect.value);
@@ -408,7 +451,8 @@ function renderSummary(rows) {
   if (els.puSelect.value !== "All") parts.push(els.puSelect.selectedOptions[0]?.textContent || els.puSelect.value);
   els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
   if (!parts.length) els.scopeTitle.textContent = `${STATES[state.selectedState].label} Results`;
-  els.scopeSubtitle.textContent = `${electionLabel(rows)} - ${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
+  const puCount = totals.pollingUnits || rows.length;
+  els.scopeSubtitle.textContent = `${electionLabel(rows)} - ${puCount.toLocaleString()} polling unit record${puCount === 1 ? "" : "s"}`;
   return totals;
 }
 
@@ -488,10 +532,11 @@ function renderLgaTable() {
     grouped.get(key).push(row);
   });
   const rows = [...grouped.entries()].map(([lga, items]) => {
-    const totals = aggregate(items);
+    const summary = state.lgaSummaryByName.get(normalizeName(lga));
+    const totals = aggregateFromSummaryRow(summary, items);
     const leader = sortedParties(totals)[0];
     const upload = lgaUploadStats(lga, items);
-    return { lga, items, totals, leader, upload };
+    return { lga, items, summary, totals, leader, upload };
   });
   rows.sort((a, b) => a.lga.localeCompare(b.lga));
   els.lgaCount.textContent = `${rows.length} LGA${rows.length === 1 ? "" : "s"}`;
@@ -505,7 +550,7 @@ function renderLgaTable() {
               <tr>
                 <td>${row.lga}</td>
                 <td>${electionLabel(row.items)}</td>
-                <td>${row.items.length.toLocaleString()}</td>
+                <td>${(row.totals.pollingUnits || row.items.length).toLocaleString()}</td>
                 <td>${row.upload.uploaded.toLocaleString()} / ${row.upload.expected.toLocaleString()} (${row.upload.percent.toFixed(0)}%)</td>
                 <td>${fmt(row.totals.accredited)}</td>
                 <td>${fmt(row.totals.valid)}</td>
@@ -681,7 +726,7 @@ function renderMap() {
 
   const stats = new Map();
   grouped.forEach((items, key) => {
-    const totals = aggregate(items);
+    const totals = aggregateFromSummaryRow(state.lgaSummaryByName.get(key), items);
     const leader = sortedParties(totals)[0] || { party: "No data", votes: 0 };
     const upload = lgaUploadStats(items[0]?.LGA || key, items);
     stats.set(key, { items, totals, leader, upload });
@@ -817,7 +862,8 @@ function drawCard(rows, totals) {
   ctx.fillText(title, 52, 178);
   ctx.font = "500 20px system-ui";
   ctx.fillStyle = "#647174";
-  ctx.fillText(`${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`, 52, 212);
+  const reportPuCount = totals.pollingUnits || rows.length;
+  ctx.fillText(`${reportPuCount.toLocaleString()} polling unit record${reportPuCount === 1 ? "" : "s"}`, 52, 212);
 
   const metrics = [
     ["Registered", fmt(totals.registered)],
@@ -982,7 +1028,7 @@ function drawNumberCard(rows, totals) {
     ["Valid Votes", fmt(totals.valid), ink],
     ["Accredited", fmt(totals.accredited), "#1f7a4d"],
     ["Registered", fmt(totals.registered), "#5863a3"],
-    ["Polling Units", rows.length.toLocaleString(), "#d89720"],
+    ["Polling Units", (totals.pollingUnits || rows.length).toLocaleString(), "#d89720"],
     ["Invalid Votes", fmt(totals.invalid), "#b7433f"],
     ["Turnout", turnout, "#27b9d3"],
   ];
@@ -1072,7 +1118,7 @@ function cardFileName(suffix) {
 
 function renderCardCanvas(type) {
   const rows = getFilteredRows();
-  const totals = aggregate(rows);
+  const totals = aggregateForScope(rows);
   if (type === "number") {
     drawNumberCard(rows, totals);
     return els.numberCardCanvas;
@@ -1194,6 +1240,10 @@ async function loadStateData(stateKey, options = {}) {
     return res.text();
   });
   state.rows = parseCsv(csvText);
+  state.stateSummaryRows = await fetch(`/output/${stateKey}/state_summary.csv?v=${Date.now()}`)
+    .then((res) => (res.ok ? res.text() : ""))
+    .then((text) => (text ? parseCsv(text) : []))
+    .catch(() => []);
   state.lgaSummaryRows = await fetch(`/output/${stateKey}/lga_summary.csv?v=${Date.now()}`)
     .then((res) => (res.ok ? res.text() : ""))
     .then((text) => (text ? parseCsv(text) : []))
@@ -1201,7 +1251,24 @@ async function loadStateData(stateKey, options = {}) {
   state.lgaSummaryByName = new Map(
     state.lgaSummaryRows.map((row) => [normalizeName(row.LGA), row]),
   );
-  state.partyColumns = Object.keys(state.rows[0] || {}).filter((key) => !metaColumns.has(key));
+  state.wardSummaryRows = await fetch(`/output/${stateKey}/ward_summary.csv?v=${Date.now()}`)
+    .then((res) => (res.ok ? res.text() : ""))
+    .then((text) => (text ? parseCsv(text) : []))
+    .catch(() => []);
+  state.wardSummaryByKey = new Map(
+    state.wardSummaryRows.map((row) => [summaryKey(row.LGA, row.Ward), row]),
+  );
+  const headers = [
+    ...Object.keys(state.rows[0] || {}),
+    ...Object.keys(state.stateSummaryRows[0] || {}),
+    ...Object.keys(state.lgaSummaryRows[0] || {}),
+  ];
+  state.partyColumns = [...new Set(headers.filter((key) => !metaColumns.has(key) && ![
+    "Polling Units",
+    "INEC Uploaded Results",
+    "INEC Expected Results",
+    "INEC Upload Percent",
+  ].includes(key)))];
 
   if (!state.mapData) {
     state.mapData = await fetch(MAP_URL).then((res) => {
@@ -1258,7 +1325,7 @@ window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !els.cardPreviewModal.hidden) closeCardPreview();
   if (event.key === "Escape" && !els.loginPromptModal.hidden) closeLoginPrompt();
 });
-window.addEventListener("resize", () => renderChart(aggregate(getFilteredRows())));
+window.addEventListener("resize", () => renderChart(aggregateForScope(getFilteredRows())));
 
 boot().catch((error) => {
   document.body.innerHTML = `<main class="app-shell"><div class="panel"><div class="panel-head"><h1>Unable to load dashboard data</h1><p>${error.message}</p></div></div></main>`;

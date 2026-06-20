@@ -1,5 +1,6 @@
 const LOGO_URL = "/assets/africa-data-warehouse-logo.png";
 const MAP_URL = "/assets/maps/state_lga_boundaries.geojson";
+const DASHBOARD_REFRESH_MS = 10 * 60 * 1000;
 const STATES = {
   FCT: {
     label: "FCT",
@@ -152,6 +153,7 @@ const els = {
 };
 
 let previewCardType = "number";
+let refreshTimer = null;
 
 function parseCsv(text) {
   const rows = [];
@@ -1094,13 +1096,49 @@ function render() {
   renderPuDetail(rows);
 }
 
+function currentFilters() {
+  return {
+    lga: els.lgaSelect.value || "All",
+    ward: els.wardSelect.value || "All",
+    pu: els.puSelect.value || "All",
+  };
+}
+
+function restoreFilters(filters) {
+  if (!filters) return;
+  if ([...els.lgaSelect.options].some((option) => option.value === filters.lga)) {
+    els.lgaSelect.value = filters.lga;
+  }
+  refreshFilters();
+  if ([...els.wardSelect.options].some((option) => option.value === filters.ward)) {
+    els.wardSelect.value = filters.ward;
+  }
+  refreshFilters();
+  if ([...els.puSelect.options].some((option) => option.value === filters.pu)) {
+    syncPuSelects(filters.pu);
+  }
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) window.clearInterval(refreshTimer);
+  refreshTimer = window.setInterval(async () => {
+    try {
+      await loadStateData(state.selectedState, { preserveFilters: true });
+    } catch (error) {
+      console.error("Dashboard refresh failed", error);
+    }
+  }, DASHBOARD_REFRESH_MS);
+}
+
 async function boot() {
   state.selectedState = stateFromPath();
   fillStateSelect(state.selectedState);
   await loadStateData(state.selectedState);
+  startAutoRefresh();
 }
 
-async function loadStateData(stateKey) {
+async function loadStateData(stateKey, options = {}) {
+  const filters = options.preserveFilters ? currentFilters() : null;
   state.selectedState = stateKey;
   const config = STATES[stateKey];
   els.pageTitle.textContent = config.title;
@@ -1132,6 +1170,7 @@ async function loadStateData(stateKey) {
   }
 
   fillSelect(els.lgaSelect, unique(state.rows.map((row) => row.LGA)));
+  restoreFilters(filters);
   refreshFilters();
   render();
 }

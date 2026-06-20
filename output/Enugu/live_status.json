@@ -1,7 +1,7 @@
 {
-  "first_upload_seen": false,
-  "max_result_updated_time": "",
+  "first_upload_seen": true,
+  "max_result_updated_time": "1781969763225.0",
   "state": "Enugu",
   "total_polling_units": 1488,
-  "uploaded_count": 0
+  "uploaded_count": 40
 }

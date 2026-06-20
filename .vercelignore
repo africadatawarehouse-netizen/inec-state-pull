@@ -1,6 +1,15 @@
 .git/
 .vercel/
 downloads/
+logs/
+output/manual_corrections/**/*.jpg
+output/manual_corrections/**/*.png
+output/manual_corrections/**/*.pdf
+output/manual_corrections/*.js
+output/direct_ward_pull_failed.csv
+output/fct_ward_discovery_failed.csv
+output/incremental_skipped.csv
+output/retry_still_failed.csv
 __pycache__/
 *.pyc
 .env

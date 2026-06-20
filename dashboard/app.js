@@ -26,52 +26,52 @@ const STATES = {
     cardSubtitle: "Osun Governorship Election Results",
   },
   Enugu: {
-    label: "Enugu",
-    title: "Enugu June 20 By-Election Results",
+    label: "Enugu - Senatorial",
+    title: "Enugu North Senatorial By-Election Results",
     dataUrl: "/output/Enugu/pu_results.csv",
     excelUrl: "/output/Enugu/results.xlsx",
     csvUrl: "/output/Enugu/pu_results.csv",
-    cardSubtitle: "Enugu June 20 By-Election Results",
+    cardSubtitle: "Senatorial election - 2026-06-20 - enugu north",
   },
   Kano: {
-    label: "Kano",
-    title: "Kano June 20 By-Election Results",
+    label: "Kano - House of Representatives",
+    title: "Dawakin Kudu/Warawa House of Representatives By-Election Results",
     dataUrl: "/output/Kano/pu_results.csv",
     excelUrl: "/output/Kano/results.xlsx",
     csvUrl: "/output/Kano/pu_results.csv",
-    cardSubtitle: "Kano June 20 By-Election Results",
+    cardSubtitle: "House of Representatives election - 2026-06-20 - dawakin kudu/warawa",
   },
   Kebbi: {
-    label: "Kebbi",
-    title: "Kebbi June 20 By-Election Results",
+    label: "Kebbi - House of Assembly",
+    title: "Zuru House of Assembly By-Election Results",
     dataUrl: "/output/Kebbi/pu_results.csv",
     excelUrl: "/output/Kebbi/results.xlsx",
     csvUrl: "/output/Kebbi/pu_results.csv",
-    cardSubtitle: "Kebbi June 20 By-Election Results",
+    cardSubtitle: "House of Assemby election - 2026-06-20 - ZURU",
   },
   Nasarawa: {
-    label: "Nasarawa",
-    title: "Nasarawa June 20 By-Election Results",
+    label: "Nasarawa - Senatorial",
+    title: "Nasarawa North Senatorial By-Election Results",
     dataUrl: "/output/Nasarawa/pu_results.csv",
     excelUrl: "/output/Nasarawa/results.xlsx",
     csvUrl: "/output/Nasarawa/pu_results.csv",
-    cardSubtitle: "Nasarawa June 20 By-Election Results",
+    cardSubtitle: "Senatorial election - 2026-06-20 - Nassarawa North",
   },
   Ondo: {
-    label: "Ondo",
-    title: "Ondo June 20 By-Election Results",
+    label: "Ondo - Senatorial",
+    title: "Ondo South Senatorial By-Election Results",
     dataUrl: "/output/Ondo/pu_results.csv",
     excelUrl: "/output/Ondo/results.xlsx",
     csvUrl: "/output/Ondo/pu_results.csv",
-    cardSubtitle: "Ondo June 20 By-Election Results",
+    cardSubtitle: "Senatorial election - 2026-06-20 - ondo south",
   },
   Rivers: {
-    label: "Rivers",
-    title: "Rivers June 20 By-Election Results",
+    label: "Rivers - Senatorial",
+    title: "Rivers South East Senatorial By-Election Results",
     dataUrl: "/output/Rivers/pu_results.csv",
     excelUrl: "/output/Rivers/results.xlsx",
     csvUrl: "/output/Rivers/pu_results.csv",
-    cardSubtitle: "Rivers June 20 By-Election Results",
+    cardSubtitle: "Senatorial election - 2026-06-20 - rivers south east",
   },
 };
 
@@ -205,6 +205,17 @@ function fmt(value) {
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function electionNames(rows = state.rows) {
+  return unique(rows.map((row) => String(row["Election Name"] || "").replace("Assemby", "Assembly")));
+}
+
+function electionLabel(rows = state.rows) {
+  const names = electionNames(rows);
+  if (!names.length) return STATES[state.selectedState].cardSubtitle;
+  if (names.length === 1) return names[0];
+  return `${names.length} elections: ${names.join("; ")}`;
 }
 
 function getFilteredRows() {
@@ -353,7 +364,7 @@ function renderSummary(rows) {
   if (els.puSelect.value !== "All") parts.push(els.puSelect.selectedOptions[0]?.textContent || els.puSelect.value);
   els.scopeTitle.textContent = parts.length ? parts.join(" / ") : "FCT Results";
   if (!parts.length) els.scopeTitle.textContent = `${STATES[state.selectedState].label} Results`;
-  els.scopeSubtitle.textContent = `${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
+  els.scopeSubtitle.textContent = `${electionLabel(rows)} - ${rows.length.toLocaleString()} polling unit record${rows.length === 1 ? "" : "s"}`;
   return totals;
 }
 
@@ -441,13 +452,14 @@ function renderLgaTable() {
   els.lgaCount.textContent = `${rows.length} LGA${rows.length === 1 ? "" : "s"}`;
   els.lgaTable.innerHTML = `
     <table>
-      <thead><tr><th>LGA</th><th>PU</th><th>Accredited</th><th>Valid</th><th>Leader</th></tr></thead>
+      <thead><tr><th>LGA</th><th>Election</th><th>PU</th><th>Accredited</th><th>Valid</th><th>Leader</th></tr></thead>
       <tbody>
         ${rows
           .map(
             (row) => `
               <tr>
                 <td>${row.lga}</td>
+                <td>${electionLabel(row.items)}</td>
                 <td>${row.items.length.toLocaleString()}</td>
                 <td>${fmt(row.totals.accredited)}</td>
                 <td>${fmt(row.totals.valid)}</td>
@@ -491,6 +503,7 @@ function renderPuDetail(rows) {
   const imageHref = externalImage || localImage;
   els.documentStatus.textContent = imageHref ? "Result sheet available" : "No result-sheet file recorded";
   const items = [
+    ["Election", row["Election Name"] || STATES[state.selectedState].cardSubtitle],
     ["Polling Unit", row["Polling Unit"] || ""],
     ["PU Code", row["PU Code"] || ""],
     ["Ward", row.Ward || ""],
@@ -524,27 +537,27 @@ function getScopeDetails(rows) {
     return {
       level: "Polling Unit",
       title: selectedPu["Polling Unit"] || selectedPu["PU Code"] || "Polling Unit",
-      subtitle: `${selectedPu.LGA || state.selectedState} / ${selectedPu.Ward || ""} / ${selectedPu["PU Code"] || ""}`,
+      subtitle: `${selectedPu["Election Name"] || STATES[state.selectedState].cardSubtitle} / ${selectedPu.LGA || state.selectedState} / ${selectedPu.Ward || ""} / ${selectedPu["PU Code"] || ""}`,
     };
   }
   if (els.wardSelect.value !== "All") {
     return {
       level: "Ward",
       title: els.wardSelect.value,
-      subtitle: `${els.lgaSelect.value} LGA, ${state.selectedState}`,
+      subtitle: `${electionLabel(rows)} / ${els.lgaSelect.value} LGA, ${state.selectedState}`,
     };
   }
   if (els.lgaSelect.value !== "All") {
     return {
       level: "LGA",
       title: `${els.lgaSelect.value} LGA`,
-      subtitle: `${state.selectedState} ${STATES[state.selectedState].cardSubtitle}`,
+      subtitle: `${state.selectedState} / ${electionLabel(rows)}`,
     };
   }
   return {
     level: "State",
     title: `${state.selectedState} State`,
-    subtitle: STATES[state.selectedState].cardSubtitle,
+    subtitle: electionLabel(rows),
   };
 }
 
@@ -690,13 +703,13 @@ function renderMap() {
         <div class="legend-item">
           <span class="legend-swatch" style="background:${partyColor(item.leader.party, index)}"></span>
           <strong>${lga}</strong>
-          <span>${item.leader.party} · ${percentUploaded.toFixed(0)}%</span>
+          <span>${item.leader.party} - ${percentUploaded.toFixed(0)}%</span>
         </div>
       `;
     })
     .join("");
   els.mapLegend.innerHTML = `${legendItems || `<div class="legend-item"><span class="legend-swatch"></span><strong>No results yet</strong><span>0%</span></div>`}<p class="map-source">Boundaries: geoBoundaries / GRID3, CC BY 4.0</p>`;
-  els.mapStatus.textContent = selectedLga === "ALL" ? "Click an LGA to zoom in" : `${els.lgaSelect.value} selected · click again to zoom out`;
+  els.mapStatus.textContent = selectedLga === "ALL" ? "Click an LGA to zoom in" : `${els.lgaSelect.value} selected - click again to zoom out`;
 }
 
 function drawRoundRect(ctx, x, y, width, height, radius) {
@@ -743,7 +756,7 @@ function drawCard(rows, totals) {
   ctx.font = "700 32px system-ui";
   ctx.fillText("Africa Data Warehouse", 126, 52);
   ctx.font = "500 18px system-ui";
-  ctx.fillText(STATES[state.selectedState].cardSubtitle, 126, 82);
+  ctx.fillText(electionLabel(rows), 126, 82);
 
   ctx.fillStyle = "rgba(39, 185, 211, 0.12)";
   ctx.font = "900 92px system-ui";

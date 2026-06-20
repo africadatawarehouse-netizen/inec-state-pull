@@ -64,14 +64,16 @@ python live_state_spooler.py --state Osun --irev-url "https://inecelectionresult
 
 Use `--download-files` if local result-sheet downloads are also needed. The `--deploy` flag commits the updated output files, pushes them to GitHub, and redeploys Vercel after each scrape.
 
-## Ekiti Automatic Refresh
+## Automatic Live Refresh
 
-GitHub Actions runs `.github/workflows/ekiti-live-refresh.yml` for the Ekiti live feed:
+GitHub Actions runs `.github/workflows/ekiti-live-refresh.yml` for the Ekiti live feed first, then the June 20 by-election feeds:
 
-- Before the first result upload is detected, it checks every 30 minutes.
+- Before the first result upload is detected in any monitored feed, it checks every 30 minutes.
 - Once at least one result upload is detected, it checks every 10 minutes.
-- It commits changed `output/Ekiti/` files only after uploaded results exist, so Vercel can redeploy from GitHub without needing a local computer to stay on.
-- It can also be started manually from the GitHub Actions tab with the `Ekiti live refresh` workflow.
+- Ekiti is refreshed first on each run.
+- Secondary feeds currently refreshed after Ekiti are Enugu, Kano, Kebbi, Nasarawa, Ondo, and Rivers.
+- It commits changed output files so Vercel can redeploy from GitHub without needing a local computer to stay on.
+- It can also be started manually from the GitHub Actions tab with the `Today live election refresh` workflow.
 
 ## Generated Outputs
 

@@ -1,4 +1,4 @@
-name: Ekiti live refresh
+name: Today live election refresh
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  refresh-ekiti:
+  refresh-live-feeds:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
         id: cadence
         shell: bash
         run: |
-          first_upload_seen="$(python scripts/ekiti_refresh_status.py first-upload-seen)"
+          first_upload_seen="$(python scripts/ekiti_refresh_status.py any-first-upload-seen --states Ekiti Enugu Kano Kebbi Nasarawa Ondo Rivers)"
           schedule="${{ github.event.schedule }}"
           should_run="true"
 
@@ -48,25 +48,46 @@ jobs:
           echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
           echo "first_upload_seen=$first_upload_seen" >> "$GITHUB_OUTPUT"
 
-      - name: Refresh Ekiti from INEC
+      - name: Refresh priority Ekiti feed from INEC
         if: steps.cadence.outputs.should_run == 'true'
         run: python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/6a35bb87b4e45d80b33a6e38"
 
-      - name: Record upload status
+      - name: Record Ekiti upload status
         if: steps.cadence.outputs.should_run == 'true'
-        id: status
-        run: python scripts/ekiti_refresh_status.py record
+        run: python scripts/ekiti_refresh_status.py record --state Ekiti
 
-      - name: Commit refreshed Ekiti outputs
-        if: steps.cadence.outputs.should_run == 'true' && steps.status.outputs.uploaded_count != '0'
+      - name: Refresh secondary June 20 feeds from INEC
+        if: steps.cadence.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          python live_state_spooler.py --state Enugu --irev-url "https://inecelectionresults.ng/elections/6a35c53958f677851b78ac96"
+          python scripts/ekiti_refresh_status.py record --state Enugu
+
+          python live_state_spooler.py --state Kano --irev-url "https://inecelectionresults.ng/elections/6a35c3e587b1768452f7b027"
+          python scripts/ekiti_refresh_status.py record --state Kano
+
+          python live_state_spooler.py --state Kebbi --irev-url "https://inecelectionresults.ng/elections/6a35d6ee52574004bac51620"
+          python scripts/ekiti_refresh_status.py record --state Kebbi
+
+          python live_state_spooler.py --state Nasarawa --irev-url "https://inecelectionresults.ng/elections/6a35c6ef0a25e5860383aa57"
+          python scripts/ekiti_refresh_status.py record --state Nasarawa
+
+          python live_state_spooler.py --state Ondo --irev-url "https://inecelectionresults.ng/elections/6a35c845f42f4600b2634026"
+          python scripts/ekiti_refresh_status.py record --state Ondo
+
+          python live_state_spooler.py --state Rivers --irev-url "https://inecelectionresults.ng/elections/6a35ca5181ddfe01b36faefd"
+          python scripts/ekiti_refresh_status.py record --state Rivers
+
+      - name: Commit refreshed live outputs
+        if: steps.cadence.outputs.should_run == 'true'
         shell: bash
         run: |
           git config user.name "Africa Data Warehouse Bot"
           git config user.email "actions@github.com"
-          git add output/Ekiti
+          git add output/Ekiti output/Enugu output/Kano output/Kebbi output/Nasarawa output/Ondo output/Rivers
           if git diff --cached --quiet; then
-            echo "No Ekiti output changes to commit."
+            echo "No live output changes to commit."
           else
-            git commit -m "Auto-refresh Ekiti live results"
+            git commit -m "Auto-refresh live election results"
             git push
           fi

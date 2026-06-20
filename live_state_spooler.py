@@ -21,7 +21,13 @@ from full_results_downloader import (
 STATE_ROUTES = {
     "fct": "FCT",
     "ekiti": "Ekiti",
+    "enugu": "Enugu",
+    "kano": "Kano",
+    "kebbi": "Kebbi",
+    "nasarawa": "Nasarawa",
+    "ondo": "Ondo",
     "osun": "Osun",
+    "rivers": "Rivers",
 }
 
 

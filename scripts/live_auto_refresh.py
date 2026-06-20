@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 import subprocess
 import sys
 import time
@@ -27,8 +29,11 @@ PUBLISH_PATHS = [
 
 
 def run(command):
+    resolved = command.copy()
+    if os.name == "nt" and resolved[0] in {"npm", "npx"}:
+        resolved[0] = shutil.which(f"{resolved[0]}.cmd") or f"{resolved[0]}.cmd"
     print(f"$ {' '.join(command)}", flush=True)
-    subprocess.run(command, check=True)
+    subprocess.run(resolved, check=True)
 
 
 def has_changes():

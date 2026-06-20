@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 downloads/
+logs/
 .vercel/
 
 .vercel

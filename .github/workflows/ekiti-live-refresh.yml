@@ -48,35 +48,40 @@ jobs:
           echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
           echo "first_upload_seen=$first_upload_seen" >> "$GITHUB_OUTPUT"
 
-      - name: Refresh priority Ekiti feed from INEC
-        if: steps.cadence.outputs.should_run == 'true'
-        run: python live_state_spooler.py --state Ekiti --irev-url "https://inecelectionresults.ng/elections/6a35bb87b4e45d80b33a6e38"
-
-      - name: Record Ekiti upload status
-        if: steps.cadence.outputs.should_run == 'true'
-        run: python scripts/ekiti_refresh_status.py record --state Ekiti
-
-      - name: Refresh secondary June 20 feeds from INEC
+      - name: Refresh live feeds from INEC
         if: steps.cadence.outputs.should_run == 'true'
         shell: bash
         run: |
-          python live_state_spooler.py --state Enugu --irev-url "https://inecelectionresults.ng/elections/6a35c53958f677851b78ac96"
-          python scripts/ekiti_refresh_status.py record --state Enugu
+          set +e
+          failed=0
 
-          python live_state_spooler.py --state Kano --irev-url "https://inecelectionresults.ng/elections/6a35c3e587b1768452f7b027"
-          python scripts/ekiti_refresh_status.py record --state Kano
+          refresh_state() {
+            local state="$1"
+            local url="$2"
 
-          python live_state_spooler.py --state Kebbi --irev-url "https://inecelectionresults.ng/elections/6a35d6ee52574004bac51620"
-          python scripts/ekiti_refresh_status.py record --state Kebbi
+            echo "::group::Refresh ${state}"
+            python live_state_spooler.py --state "$state" --irev-url "$url"
+            status=$?
+            if [ "$status" -eq 0 ]; then
+              python scripts/ekiti_refresh_status.py record --state "$state"
+            else
+              failed=1
+              echo "::warning::${state} refresh failed with exit code ${status}; continuing so other state updates can be committed."
+            fi
+            echo "::endgroup::"
+          }
 
-          python live_state_spooler.py --state Nasarawa --irev-url "https://inecelectionresults.ng/elections/6a35c6ef0a25e5860383aa57"
-          python scripts/ekiti_refresh_status.py record --state Nasarawa
+          refresh_state "Ekiti" "https://inecelectionresults.ng/elections/6a35bb87b4e45d80b33a6e38"
+          refresh_state "Enugu" "https://inecelectionresults.ng/elections/6a35c53958f677851b78ac96"
+          refresh_state "Kano" "https://inecelectionresults.ng/elections/6a35c3e587b1768452f7b027"
+          refresh_state "Kebbi" "https://inecelectionresults.ng/elections/6a35d6ee52574004bac51620"
+          refresh_state "Nasarawa" "https://inecelectionresults.ng/elections/6a35c6ef0a25e5860383aa57"
+          refresh_state "Ondo" "https://inecelectionresults.ng/elections/6a35c845f42f4600b2634026"
+          refresh_state "Rivers" "https://inecelectionresults.ng/elections/6a35ca5181ddfe01b36faefd"
 
-          python live_state_spooler.py --state Ondo --irev-url "https://inecelectionresults.ng/elections/6a35c845f42f4600b2634026"
-          python scripts/ekiti_refresh_status.py record --state Ondo
-
-          python live_state_spooler.py --state Rivers --irev-url "https://inecelectionresults.ng/elections/6a35ca5181ddfe01b36faefd"
-          python scripts/ekiti_refresh_status.py record --state Rivers
+          if [ "$failed" -ne 0 ]; then
+            echo "::warning::One or more feeds failed, but successful refreshes will still be committed."
+          fi
 
       - name: Commit refreshed live outputs
         if: steps.cadence.outputs.should_run == 'true'

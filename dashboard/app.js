@@ -317,6 +317,24 @@ function summaryRowForScope(rows) {
       || state.lgaSummaryRows.find((row) => normalizeName(row.LGA) === normalizeName(els.lgaSelect.value))
       || null;
   }
+  // State level: aggregate all LGA rows to compute state totals
+  if (state.lgaSummaryRows.length > 0) {
+    const synthRow = {};
+    state.partyColumns.forEach(party => synthRow[party] = 0);
+    state.lgaSummaryRows.forEach((row) => {
+      synthRow["Total Registered"] = (num(synthRow["Total Registered"]) || 0) + num(row["Total Registered"]);
+      synthRow["Total Accredited"] = (num(synthRow["Total Accredited"]) || 0) + num(row["Total Accredited"]);
+      synthRow["Valid Votes"] = (num(synthRow["Valid Votes"]) || 0) + num(row["Valid Votes"]);
+      synthRow["Invalid Votes"] = (num(synthRow["Invalid Votes"]) || 0) + num(row["Invalid Votes"]);
+      synthRow["Ballots Issued"] = (num(synthRow["Ballots Issued"]) || 0) + num(row["Ballots Issued"]);
+      synthRow["Ballots Used"] = (num(synthRow["Ballots Used"]) || 0) + num(row["Ballots Used"]);
+      synthRow["Polling Units"] = (num(synthRow["Polling Units"]) || 0) + num(row["Polling Units"]);
+      state.partyColumns.forEach(party => {
+        synthRow[party] = (num(synthRow[party]) || 0) + num(row[party]);
+      });
+    });
+    return synthRow;
+  }
   return state.stateSummaryRows[0] || null;
 }
 

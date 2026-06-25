@@ -237,18 +237,30 @@ function getFilteredRows() {
   });
 }
 
+function isOfficialTotalRow(row) {
+  return normalizeName(row?.LGA) === "OFFICIAL TOTAL PROVIDED";
+}
+
+function lgaSummaryDataRows() {
+  return state.lgaSummaryRows.filter((row) => !isOfficialTotalRow(row));
+}
+
+function officialStateSummaryRow() {
+  return state.lgaSummaryRows.find(isOfficialTotalRow) || null;
+}
+
 function lgaUploadStats(lga, items) {
   const summary = state.lgaSummaryByName.get(normalizeName(lga));
   const endpointUploaded = summary ? num(summary["INEC Uploaded Results"]) : 0;
   const endpointExpected = summary ? num(summary["Polling Units"]) : 0;
   const localUploaded = items.filter(hasUploadedResult).length;
   const expected = endpointExpected || items.length;
-  const uploaded = summary && "INEC Uploaded Results" in summary ? endpointUploaded : localUploaded;
+  const uploaded = endpointUploaded || localUploaded;
   return {
     uploaded,
     expected,
     percent: expected ? (uploaded / expected) * 100 : 0,
-    source: summary && "INEC Uploaded Results" in summary ? "INEC" : "Local",
+    source: endpointUploaded ? "INEC" : "Local",
   };
 }
 
@@ -317,11 +329,14 @@ function summaryRowForScope(rows) {
       || state.lgaSummaryRows.find((row) => normalizeName(row.LGA) === normalizeName(els.lgaSelect.value))
       || null;
   }
-  // State level: aggregate all LGA rows to compute state totals
-  if (state.lgaSummaryRows.length > 0) {
+  const officialRow = officialStateSummaryRow();
+  if (officialRow) return officialRow;
+
+  // State level: aggregate all LGA rows to compute state totals.
+  if (lgaSummaryDataRows().length > 0) {
     const synthRow = {};
     state.partyColumns.forEach(party => synthRow[party] = 0);
-    state.lgaSummaryRows.forEach((row) => {
+    lgaSummaryDataRows().forEach((row) => {
       synthRow["Total Registered"] = (num(synthRow["Total Registered"]) || 0) + num(row["Total Registered"]);
       synthRow["Total Accredited"] = (num(synthRow["Total Accredited"]) || 0) + num(row["Total Accredited"]);
       synthRow["Valid Votes"] = (num(synthRow["Valid Votes"]) || 0) + num(row["Valid Votes"]);
@@ -361,6 +376,18 @@ function hasVoteFigures(row) {
   return state.partyColumns.some((party) => num(row[party]) > 0) || num(row["Valid Votes"]) > 0;
 }
 
+function uploadStatsForScope(rows) {
+  const summaryRow = summaryRowForScope(rows);
+  const total = num(summaryRow?.["Polling Units"] || summaryRow?.["INEC Expected Results"]) || rows.length;
+  const summaryUploaded = num(summaryRow?.["INEC Uploaded Results"]);
+  const uploaded = summaryUploaded || rows.filter(hasUploadedResult).length;
+  return {
+    total,
+    uploaded,
+    percent: total ? (uploaded / total) * 100 : 0,
+  };
+}
+
 function ensureProgressStat(id, label) {
   let valueEl = document.querySelector(`#${id}`);
   if (valueEl) return valueEl;
@@ -377,13 +404,10 @@ function ensureProgressStat(id, label) {
 }
 
 function renderUploadProgress(rows) {
-  const summaryRow = summaryRowForScope(rows);
-  const total = num(summaryRow?.["Polling Units"] || summaryRow?.["INEC Expected Results"]) || rows.length;
-  const uploaded = summaryRow && "INEC Uploaded Results" in summaryRow
-    ? num(summaryRow["INEC Uploaded Results"])
-    : rows.filter(hasUploadedResult).length;
+  const upload = uploadStatsForScope(rows);
+  const { total, uploaded } = upload;
   const voteFigureRows = rows.filter(hasVoteFigures).length;
-  const uploadedPercent = total ? (uploaded / total) * 100 : 0;
+  const uploadedPercent = upload.percent;
   const voteFigurePercent = total ? (voteFigureRows / total) * 100 : 0;
   const voteFigureCountEl = ensureProgressStat("voteFigurePuCount", "PUs with Figures");
   const voteFigurePercentEl = ensureProgressStat("voteFigurePuPercent", "Figures %");
@@ -897,7 +921,12 @@ function drawCard(rows, totals) {
   ctx.font = "500 20px system-ui";
   ctx.fillStyle = "#647174";
   const reportPuCount = totals.pollingUnits || rows.length;
-  ctx.fillText(`${reportPuCount.toLocaleString()} polling unit record${reportPuCount === 1 ? "" : "s"}`, 52, 212);
+  const reportUpload = uploadStatsForScope(rows);
+  ctx.fillText(
+    `${reportPuCount.toLocaleString()} polling unit record${reportPuCount === 1 ? "" : "s"} / ${reportUpload.uploaded.toLocaleString()} uploaded`,
+    52,
+    212,
+  );
 
   const metrics = [
     ["Registered", fmt(totals.registered)],
@@ -956,6 +985,7 @@ function drawNumberCard(rows, totals) {
   const leadMargin = Math.max(leader.votes - runnerUp.votes, 0);
   const turnout = percent(totals.accredited, totals.registered);
   const leaderShare = percent(leader.votes, totals.valid);
+  const upload = uploadStatsForScope(rows);
   const displayFont = '"Segoe UI Variable Display", "Aptos Display", "Bahnschrift", system-ui';
   const textFont = '"Aptos", "Segoe UI", system-ui';
   const ink = "#172224";
@@ -1063,22 +1093,24 @@ function drawNumberCard(rows, totals) {
     ["Accredited", fmt(totals.accredited), "#1f7a4d"],
     ["Registered", fmt(totals.registered), "#5863a3"],
     ["Polling Units", (totals.pollingUnits || rows.length).toLocaleString(), "#d89720"],
+    ["Uploaded PUs", upload.uploaded.toLocaleString(), "#476a6f"],
+    ["Upload Rate", `${upload.percent.toFixed(1)}%`, "#8d4776"],
     ["Invalid Votes", fmt(totals.invalid), "#b7433f"],
     ["Turnout", turnout, "#27b9d3"],
   ];
   metricCards.forEach((metric, index) => {
-    const col = index % 3;
-    const row = Math.floor(index / 3);
-    const x = 72 + col * 438;
+    const col = index % 4;
+    const row = Math.floor(index / 4);
+    const x = 72 + col * 324;
     const y = 982 + row * 166;
     ctx.fillStyle = "#ffffff";
-    drawRoundRect(ctx, x, y, 400, 132, 18);
+    drawRoundRect(ctx, x, y, 292, 132, 18);
     ctx.fill();
     ctx.strokeStyle = line;
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.fillStyle = metric[2];
-    ctx.font = `900 42px ${displayFont}`;
+    ctx.font = `900 36px ${displayFont}`;
     ctx.textAlign = "left";
     ctx.fillText(metric[1], x + 28, y + 62);
     ctx.fillStyle = muted;
@@ -1283,7 +1315,7 @@ async function loadStateData(stateKey, options = {}) {
     .then((text) => (text ? parseCsv(text) : []))
     .catch(() => []);
   state.lgaSummaryByName = new Map(
-    state.lgaSummaryRows.map((row) => [normalizeName(row.LGA), row]),
+    lgaSummaryDataRows().map((row) => [normalizeName(row.LGA), row]),
   );
   state.wardSummaryRows = await fetch(`/output/${stateKey}/ward_summary.csv?v=${Date.now()}`)
     .then((res) => (res.ok ? res.text() : ""))
@@ -1292,11 +1324,8 @@ async function loadStateData(stateKey, options = {}) {
   state.wardSummaryByKey = new Map(
     state.wardSummaryRows.map((row) => [summaryKey(row.LGA, row.Ward), row]),
   );
-  const headers = [
-    ...Object.keys(state.rows[0] || {}),
-    ...Object.keys(state.stateSummaryRows[0] || {}),
-    ...Object.keys(state.lgaSummaryRows[0] || {}),
-  ];
+  const summaryHeaders = Object.keys(state.lgaSummaryRows[0] || state.stateSummaryRows[0] || {});
+  const headers = summaryHeaders.length ? summaryHeaders : Object.keys(state.rows[0] || {});
   state.partyColumns = [...new Set(headers.filter((key) => !metaColumns.has(key) && ![
     "Polling Units",
     "INEC Uploaded Results",

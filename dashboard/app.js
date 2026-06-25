@@ -261,6 +261,7 @@ function aggregate(rows) {
     issued: 0,
     used: 0,
     parties: {},
+    partyTotal: 0,
   };
 
   rows.forEach((row) => {
@@ -274,7 +275,7 @@ function aggregate(rows) {
       totals.parties[party] = (totals.parties[party] || 0) + num(row[party]);
     });
   });
-
+  totals.partyTotal = Object.values(totals.parties).reduce((sum, votes) => sum + votes, 0);
   return totals;
 }
 
@@ -289,10 +290,12 @@ function aggregateFromSummaryRow(row, fallbackRows = []) {
     used: num(row["Ballots Used"]),
     pollingUnits: num(row["Polling Units"]) || fallbackRows.length,
     parties: {},
+    partyTotal: 0,
   };
   state.partyColumns.forEach((party) => {
     totals.parties[party] = num(row[party]);
   });
+  totals.partyTotal = Object.values(totals.parties).reduce((sum, votes) => sum + votes, 0);
   return totals;
 }
 
@@ -303,10 +306,16 @@ function summaryKey(lga, ward) {
 function summaryRowForScope(rows) {
   if (els.puSelect.value !== "All") return null;
   if (els.wardSelect.value !== "All") {
-    return state.wardSummaryByKey.get(summaryKey(els.lgaSelect.value, els.wardSelect.value)) || null;
+    return state.wardSummaryByKey.get(summaryKey(els.lgaSelect.value, els.wardSelect.value))
+      || state.wardSummaryRows.find(
+        (row) => normalizeName(row.LGA) === normalizeName(els.lgaSelect.value)
+          && normalizeName(row.Ward) === normalizeName(els.wardSelect.value),
+      ) || null;
   }
   if (els.lgaSelect.value !== "All") {
-    return state.lgaSummaryByName.get(normalizeName(els.lgaSelect.value)) || null;
+    return state.lgaSummaryByName.get(normalizeName(els.lgaSelect.value))
+      || state.lgaSummaryRows.find((row) => normalizeName(row.LGA) === normalizeName(els.lgaSelect.value))
+      || null;
   }
   return state.stateSummaryRows[0] || null;
 }
@@ -460,19 +469,26 @@ function renderPartyList(totals) {
   const parties = sortedParties(totals);
   const maxVotes = Math.max(...parties.map((item) => item.votes), 1);
   els.winnerText.textContent = parties[0] ? `${parties[0].party} leads with ${fmt(parties[0].votes)}` : "";
-  els.partyList.innerHTML = parties
-    .map((item, index) => {
-      const colors = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f"];
-      const width = (item.votes / maxVotes) * 100;
-      return `
-        <div class="party-row">
-          <div class="party-code">${item.party}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${colors[index % colors.length]}"></div></div>
-          <div class="party-votes">${fmt(item.votes)}</div>
-        </div>
-      `;
-    })
-    .join("");
+  const overallVotes = fmt(totals.partyTotal || Object.values(totals.parties).reduce((sum, votes) => sum + votes, 0));
+  els.partyList.innerHTML = `
+    <div class="party-total-row">
+      <div class="party-total-title">All parties total</div>
+      <div class="party-total-value">${overallVotes}</div>
+    </div>
+    ${parties
+      .map((item, index) => {
+        const colors = ["#27b9d3", "#1f7a4d", "#d89720", "#b7433f", "#476a6f", "#7d5a38", "#5863a3", "#8d4776"];
+        const width = (item.votes / maxVotes) * 100;
+        return `
+          <div class="party-row">
+            <div class="party-code">${item.party}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${colors[index % colors.length]}"></div></div>
+            <div class="party-votes">${fmt(item.votes)}</div>
+          </div>
+        `;
+      })
+      .join("")}
+  `;
 }
 
 function renderChart(totals) {

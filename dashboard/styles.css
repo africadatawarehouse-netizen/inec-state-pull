@@ -388,6 +388,29 @@ select {
   padding: 14px;
 }
 
+.party-total-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(39, 185, 211, 0.08);
+  border: 1px solid rgba(39, 185, 211, 0.16);
+}
+
+.party-total-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e2f3c;
+}
+
+.party-total-value {
+  font-size: 16px;
+  font-weight: 900;
+  text-align: right;
+}
+
 .party-row {
   display: grid;
   grid-template-columns: 54px 1fr 80px;

@@ -1,2 +1,2 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c53958f677851b78ac96,IGBO EZE NORTH,UMUOZZI IX,5f0f3c008f77bb3acad099ab,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35c53958f677851b78ac96,IGBO ETITI,OHAODO II,5f0f3bfc8f77bb3acad0998d,530 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3bfc8f77bb3acad0998d

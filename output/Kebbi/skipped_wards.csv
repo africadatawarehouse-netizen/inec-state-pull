@@ -1,0 +1,3 @@
+Election ID,LGA,Ward,Ward ID,Error
+6a35d6ee52574004bac51620,ZURU,BEDI,5f0f3d4b8f77bb3acad0a25d,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,ISGOGO /DAGO,5f0f3d4b8f77bb3acad0a25f,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"

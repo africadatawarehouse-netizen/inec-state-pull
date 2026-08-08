@@ -1,0 +1,4 @@
+Election ID,LGA,Ward,Ward ID,Error
+6a35c6ef0a25e5860383aa57,WAMBA,ARUM,5f0f3dc78f77bb3acad0a595,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c6ef0a25e5860383aa57,NASARAWA EGGON,ALOGANI,5f0f3dc48f77bb3acad0a57d,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c6ef0a25e5860383aa57,NASARAWA EGGON,UMME,5f0f3dc28f77bb3acad0a574,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"

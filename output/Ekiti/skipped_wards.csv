@@ -1,2 +1,9 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35bb87b4e45d80b33a6e38,GBONYIN,IMESI,5f0f3bdf8f77bb3acad098cc,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Max retries exceeded with url: /api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdf8f77bb3acad098cc (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)')))"
+6a35bb87b4e45d80b33a6e38,ILEJEMEJE,ILUDUN I,5f0f3be78f77bb3acad09907,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,IDO / OSI,IDO  II,5f0f3be08f77bb3acad098d3,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,IDO / OSI,AYETORO  II,5f0f3be18f77bb3acad098dc,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,ISE / ORUN,ORAYE II,5f0f3bea8f77bb3acad0991b,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,IKOLE,IKOLE SOUTH,5f0f3be58f77bb3acad098f8,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,ADO EKITI,ADO 'E' IJOKA,5f0f3bd68f77bb3acad09889,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,IJERO,IJERO WARD 'D',5f0f3be28f77bb3acad098e0,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35bb87b4e45d80b33a6e38,EKITI EAST,OBADORE  IV,5f0f3bd98f77bb3acad098a4,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"

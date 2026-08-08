@@ -1,2 +1,9 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c53958f677851b78ac96,IGBO ETITI,OHAODO II,5f0f3bfc8f77bb3acad0998d,530 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3bfc8f77bb3acad0998d
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,ALOR AGU,5f0f3c018f77bb3acad099ad,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,ECHARA,5f0f3c018f77bb3acad099b0,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,IHEAKA (LIKKI/AKUTARA WARD),5f0f3c018f77bb3acad099b2,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,NSUKKA,IBEKU,5f0f3c088f77bb3acad099e5,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,IGBO EZE NORTH,UMUOZZI II,5f0f3bff8f77bb3acad099a4,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,IGBO ETITI,OZALLA II,5f0f3bfd8f77bb3acad0998f,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,UZO-UWANI,UMULOKPA,5f0f3c138f77bb3acad09a2c,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c53958f677851b78ac96,UZO-UWANI,OJO,5f0f3c138f77bb3acad09a2e,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"

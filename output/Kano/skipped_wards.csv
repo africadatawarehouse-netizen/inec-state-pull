@@ -1,2 +1,4 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c3e587b1768452f7b027,WARAWA,JEMAGU,5f0f3cf18f77bb3acad0a009,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf18f77bb3acad0a009
+6a35c3e587b1768452f7b027,DAWAKI KUDU,DAWAKIJI,5f0f3cba8f77bb3acad09e93,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c3e587b1768452f7b027,DAWAKI KUDU,ZOGARAWA,5f0f3cbb8f77bb3acad09e9e,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35c3e587b1768452f7b027,WARAWA,KATARKAWA,5f0f3cf28f77bb3acad0a00c,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"

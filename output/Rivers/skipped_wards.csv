@@ -1,8 +1,2 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35ca5181ddfe01b36faefd,ANDONI,SAMANGA,5f0f3ec78f77bb3acad0ac20,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,KHANA,TAABAA,5f0f3edc8f77bb3acad0ac9e,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,GOKANA,BIARA II,5f0f3ed98f77bb3acad0ac89,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,GOKANA,BODO II,5f0f3ed78f77bb3acad0ac7a,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,TAI,KIRA/BOROBARA,5f0f3eee8f77bb3acad0ad1a,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,TAI,BAN-OGOI,5f0f3eef8f77bb3acad0ad1f,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-6a35ca5181ddfe01b36faefd,OYIGBO,KOMKOM,5f0f3eeb8f77bb3acad0ad01,"('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+6a35ca5181ddfe01b36faefd,ANDONI,NGO  TOWN,5f0f3ec68f77bb3acad0ac19,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec68f77bb3acad0ac19

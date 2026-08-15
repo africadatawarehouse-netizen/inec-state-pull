@@ -1,6 +1,19 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35bb87b4e45d80b33a6e38,MOBA,IKUN I,5f0f3beb8f77bb3acad09926,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3beb8f77bb3acad09926
-6a35bb87b4e45d80b33a6e38,GBONYIN,EGBE / IRO,5f0f3bde8f77bb3acad098c8,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bde8f77bb3acad098c8
-6a35bb87b4e45d80b33a6e38,IJERO,IPOTI WARD 'B',5f0f3be28f77bb3acad098e2,Response ended prematurely
-6a35bb87b4e45d80b33a6e38,IJERO,IPOTI WARD 'A',5f0f3be28f77bb3acad098e1,Response ended prematurely
-6a35bb87b4e45d80b33a6e38,IJERO,IJERO WARD 'D',5f0f3be28f77bb3acad098e0,Response ended prematurely
+6a35bb87b4e45d80b33a6e38,ISE / ORUN,ORUN I,5f0f3bea8f77bb3acad0991d,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bea8f77bb3acad0991d
+6a35bb87b4e45d80b33a6e38,IKOLE,IKOLE WEST  I,5f0f3be48f77bb3acad098f4,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be48f77bb3acad098f4
+6a35bb87b4e45d80b33a6e38,IKOLE,ODO AYEDUN / AYEBODE,5f0f3be58f77bb3acad098fc,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be58f77bb3acad098fc
+6a35bb87b4e45d80b33a6e38,IKOLE,IPAO / OKE AKO / IRELE,5f0f3be68f77bb3acad098fe,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be68f77bb3acad098fe
+6a35bb87b4e45d80b33a6e38,IKOLE,IKOLE EAST,5f0f3be58f77bb3acad098f6,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be58f77bb3acad098f6
+6a35bb87b4e45d80b33a6e38,IKOLE,OKE AYEDUN,5f0f3be58f77bb3acad098fd,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be58f77bb3acad098fd
+6a35bb87b4e45d80b33a6e38,IKOLE,ODO AYEDUN  I,5f0f3be58f77bb3acad098fb,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be58f77bb3acad098fb
+6a35bb87b4e45d80b33a6e38,IKOLE,ITAPAJI / IYEMERO,5f0f3be68f77bb3acad098ff,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be68f77bb3acad098ff
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE  VI,5f0f3bdc8f77bb3acad098b8,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdc8f77bb3acad098b8
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE  I,5f0f3bdb8f77bb3acad098b3,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdb8f77bb3acad098b3
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE   IV,5f0f3bdc8f77bb3acad098b6,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdc8f77bb3acad098b6
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE   V,5f0f3bdc8f77bb3acad098b7,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdc8f77bb3acad098b7
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE   III,5f0f3bdb8f77bb3acad098b5,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdb8f77bb3acad098b5
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE  II,5f0f3bdb8f77bb3acad098b4,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdb8f77bb3acad098b4
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,IGBARA ODO  II,5f0f3bdc8f77bb3acad098bb,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdc8f77bb3acad098bb
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,OGOTUN  I,5f0f3bdc8f77bb3acad098bc,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdc8f77bb3acad098bc
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,OGOTUN  II,5f0f3bdd8f77bb3acad098bd,400 Client Error: Bad Request for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bdd8f77bb3acad098bd
+6a35bb87b4e45d80b33a6e38,EKITI SOUTH WEST,ILAWE  VII,5f0f3bdc8f77bb3acad098b9,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"

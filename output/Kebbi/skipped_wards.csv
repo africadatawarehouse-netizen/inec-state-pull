@@ -1,3 +1,11 @@
 Election ID,LGA,Ward,Ward ID,Error
+6a35d6ee52574004bac51620,ZURU,RIKOTO,5f0f3d4b8f77bb3acad0a262,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35d6ee52574004bac51620/pus?ward=5f0f3d4b8f77bb3acad0a262
+6a35d6ee52574004bac51620,ZURU,ZODI,5f0f3d4c8f77bb3acad0a266,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,RAFIN ZURU,5f0f3d4b8f77bb3acad0a261,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,TADURGA,5f0f3d4c8f77bb3acad0a265,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,RUMU/DABEN/SEME,5f0f3d4c8f77bb3acad0a263,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,CIROMAN DABAI,5f0f3d4b8f77bb3acad0a25e,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,SENCHI,5f0f3d4c8f77bb3acad0a264,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35d6ee52574004bac51620,ZURU,MANGA/USHE,5f0f3d4b8f77bb3acad0a260,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
 6a35d6ee52574004bac51620,ZURU,BEDI,5f0f3d4b8f77bb3acad0a25d,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
 6a35d6ee52574004bac51620,ZURU,ISGOGO /DAGO,5f0f3d4b8f77bb3acad0a25f,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"

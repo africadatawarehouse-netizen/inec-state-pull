@@ -1,4 +1,6 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35ca5181ddfe01b36faefd,ELEME,EKPORO,5f0f3ed18f77bb3acad0ac52,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ed18f77bb3acad0ac52
-6a35ca5181ddfe01b36faefd,ELEME,ALESA,5f0f3ecf8f77bb3acad0ac4e,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ecf8f77bb3acad0ac4e
-6a35ca5181ddfe01b36faefd,ANDONI,EKEDE,5f0f3ec78f77bb3acad0ac1c,522 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec78f77bb3acad0ac1c
+6a35ca5181ddfe01b36faefd,ANDONI,AGWUT-OBOLO,5f0f3ec68f77bb3acad0ac1b,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec68f77bb3acad0ac1b
+6a35ca5181ddfe01b36faefd,ANDONI,SAMANGA,5f0f3ec78f77bb3acad0ac20,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec78f77bb3acad0ac20
+6a35ca5181ddfe01b36faefd,ANDONI,ASARAMA,5f0f3ec78f77bb3acad0ac21,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec78f77bb3acad0ac21
+6a35ca5181ddfe01b36faefd,ANDONI,ATABA  II,5f0f3ec88f77bb3acad0ac23,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec88f77bb3acad0ac23
+6a35ca5181ddfe01b36faefd,OPOBO/NEKORO,QUEENS TOWN KALAMA,5f0f3ee98f77bb3acad0acf4,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ee98f77bb3acad0acf4

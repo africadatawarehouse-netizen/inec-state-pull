@@ -1,6 +1,9 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c53958f677851b78ac96,NSUKKA,MKPUNANO,5f0f3c0a8f77bb3acad099f1,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
-6a35c53958f677851b78ac96,NSUKKA,EDE-UKWU,5f0f3c098f77bb3acad099e7,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
-6a35c53958f677851b78ac96,NSUKKA,OBIMO/IKWOKA,5f0f3c0b8f77bb3acad099f5,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
-6a35c53958f677851b78ac96,NSUKKA,AGBEMEBE/UMABOR,5f0f3c098f77bb3acad099eb,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
-6a35c53958f677851b78ac96,NSUKKA,EHA-UNO,5f0f3c098f77bb3acad099ec,"HTTPSConnectionPool(host='dolphin-app-sleqh.ondigitalocean.app', port=443): Read timed out. (read timeout=90)"
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,OVOKO (AJUONA WARD),5f0f3c028f77bb3acad099b8,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c028f77bb3acad099b8
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,OVOKO (UMUELO/OVOKO AGU WARD),5f0f3c028f77bb3acad099b9,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c028f77bb3acad099b9
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,OVOKO (UMULOLO WARD),5f0f3c038f77bb3acad099ba,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c038f77bb3acad099ba
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,EZEMA WARD,5f0f3c018f77bb3acad099af,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c018f77bb3acad099af
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,ALOR AGU,5f0f3c018f77bb3acad099ad,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c018f77bb3acad099ad
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,ITCHI/UWANI II,5f0f3c028f77bb3acad099b6,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c028f77bb3acad099b6
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,IHEAKPU (AJUONA OGBAGU WARD),5f0f3c028f77bb3acad099b4,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c028f77bb3acad099b4
+6a35c53958f677851b78ac96,IGBO EZE SOUTH,UHUNOWERRE,5f0f3c038f77bb3acad099bb,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c53958f677851b78ac96/pus?ward=5f0f3c038f77bb3acad099bb

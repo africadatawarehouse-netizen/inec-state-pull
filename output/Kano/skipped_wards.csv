@@ -1,2 +1,6 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c3e587b1768452f7b027,WARAWA,KATARKAWA,5f0f3cf28f77bb3acad0a00c,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf28f77bb3acad0a00c
+6a35c3e587b1768452f7b027,WARAWA,TAMBURAWAR GABAS,5f0f3cf28f77bb3acad0a00e,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf28f77bb3acad0a00e
+6a35c3e587b1768452f7b027,WARAWA,MADARI MATA,5f0f3cf28f77bb3acad0a00d,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf28f77bb3acad0a00d
+6a35c3e587b1768452f7b027,WARAWA,GARIN DAU,5f0f3cf18f77bb3acad0a006,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf18f77bb3acad0a006
+6a35c3e587b1768452f7b027,WARAWA,JIGAWA,5f0f3cf28f77bb3acad0a00a,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf28f77bb3acad0a00a
+6a35c3e587b1768452f7b027,WARAWA,J/GALADIMA,5f0f3cf28f77bb3acad0a00b,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c3e587b1768452f7b027/pus?ward=5f0f3cf28f77bb3acad0a00b

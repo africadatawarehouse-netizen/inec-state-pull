@@ -1,4 +1,2 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35bb87b4e45d80b33a6e38,ISE / ORUN,ORAYE II,5f0f3bea8f77bb3acad0991b,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bea8f77bb3acad0991b
-6a35bb87b4e45d80b33a6e38,ISE / ORUN,ERINWA I,5f0f3be98f77bb3acad09918,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be98f77bb3acad09918
-6a35bb87b4e45d80b33a6e38,ISE / ORUN,ODO ISE  III,5f0f3be98f77bb3acad09917,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be98f77bb3acad09917
+6a35bb87b4e45d80b33a6e38,OYE,ILUPEJU  I,5f0f3bec8f77bb3acad0992e,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3bec8f77bb3acad0992e

@@ -1,5 +1,4 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35c6ef0a25e5860383aa57,NASARAWA EGGON,LIZZIN KEFFI/EZZEN,5f0f3dc38f77bb3acad0a576,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc38f77bb3acad0a576
-6a35c6ef0a25e5860383aa57,NASARAWA EGGON,MADA STATION,5f0f3dc28f77bb3acad0a575,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc28f77bb3acad0a575
-6a35c6ef0a25e5860383aa57,NASARAWA EGGON,ALOCE/GINDA,5f0f3dc38f77bb3acad0a57c,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc38f77bb3acad0a57c
-6a35c6ef0a25e5860383aa57,NASARAWA EGGON,ENDE,5f0f3dc38f77bb3acad0a57a,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc38f77bb3acad0a57a
+6a35c6ef0a25e5860383aa57,WAMBA,JIMIYA,5f0f3dc88f77bb3acad0a59e,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc88f77bb3acad0a59e
+6a35c6ef0a25e5860383aa57,WAMBA,MANGAR,5f0f3dc78f77bb3acad0a596,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc78f77bb3acad0a596
+6a35c6ef0a25e5860383aa57,WAMBA,GITTA,5f0f3dc78f77bb3acad0a597,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35c6ef0a25e5860383aa57/pus?ward=5f0f3dc78f77bb3acad0a597

@@ -1,2 +1,2 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35bb87b4e45d80b33a6e38,IKOLE,ARAROMI / BOLORUNDURO,5f0f3be58f77bb3acad098f9,520 Server Error: <none> for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be58f77bb3acad098f9
+6a35bb87b4e45d80b33a6e38,IDO / OSI,AYETORO  I,5f0f3be18f77bb3acad098db,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35bb87b4e45d80b33a6e38/pus?ward=5f0f3be18f77bb3acad098db

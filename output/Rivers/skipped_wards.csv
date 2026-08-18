@@ -1,2 +1,3 @@
 Election ID,LGA,Ward,Ward ID,Error
-6a35ca5181ddfe01b36faefd,ELEME,ONNE,5f0f3ed18f77bb3acad0ac54,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ed18f77bb3acad0ac54
+6a35ca5181ddfe01b36faefd,ANDONI,IKURU  TOWN,5f0f3ec78f77bb3acad0ac1d,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec78f77bb3acad0ac1d
+6a35ca5181ddfe01b36faefd,ANDONI,SAMANGA,5f0f3ec78f77bb3acad0ac20,504 Server Error: Gateway Timeout for url: https://dolphin-app-sleqh.ondigitalocean.app/api/v1/elections/6a35ca5181ddfe01b36faefd/pus?ward=5f0f3ec78f77bb3acad0ac20

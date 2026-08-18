@@ -1,4 +1,5 @@
 import argparse
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
@@ -9,6 +10,54 @@ from urllib.parse import urlparse
 
 import pandas as pd
 import requests
+
+
+# Optional OCR support (pytesseract + pdf2image + pillow)
+try:
+    import pytesseract
+    from PIL import Image
+except Exception:
+    pytesseract = None
+    Image = None
+
+try:
+    from pdf2image import convert_from_path
+except Exception:
+    convert_from_path = None
+
+# Auto-configure pytesseract command on Windows if installed in common location
+if pytesseract:
+    try:
+        import shutil
+        if not shutil.which("tesseract"):
+            common = [
+                r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe",
+                r"C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe",
+                r"C:\\ProgramData\\chocolatey\\bin\\tesseract.exe",
+            ]
+            for p in common:
+                if Path(p).exists():
+                    pytesseract.pytesseract.tesseract_cmd = str(Path(p))
+                    break
+    except Exception:
+        pass
+
+import shutil
+
+# If pytesseract is available but tesseract binary isn't on PATH, try common Windows install locations.
+if pytesseract:
+    try:
+        if shutil.which("tesseract") is None:
+            common = [
+                r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+                r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+            ]
+            for p in common:
+                if Path(p).exists():
+                    pytesseract.pytesseract.tesseract_cmd = str(Path(p))
+                    break
+    except Exception:
+        pass
 
 
 BASE_URL = "https://dolphin-app-sleqh.ondigitalocean.app/api/v1"
@@ -134,6 +183,64 @@ def parse_votes(votes_value):
         code = safe_text(party.get("party_code")).upper()
         if code:
             parsed[code] = party.get("vote")
+    return parsed
+
+
+def ocr_extract_text(local_path: str) -> str:
+    """Extract text from an image or PDF using pytesseract/pdf2image when available.
+    Returns empty string on any failure or if OCR libs are missing.
+    """
+    if not pytesseract or not Image:
+        return ""
+    try:
+        ext = Path(local_path).suffix.lower()
+        if ext == ".pdf":
+            if not convert_from_path:
+                return ""
+            # detect pdftoppm/poppler path if not on PATH
+            poppler_exe = shutil.which("pdftoppm")
+            poppler_path = None
+            if poppler_exe:
+                poppler_path = str(Path(poppler_exe).parent)
+            else:
+                common_poppler = [
+                    r"C:\Program Files\poppler\bin\pdftoppm.exe",
+                    r"C:\Program Files\poppler-23.05.0\Library\bin\pdftoppm.exe",
+                    r"C:\Program Files (x86)\poppler\bin\pdftoppm.exe",
+                ]
+                for p in common_poppler:
+                    if Path(p).exists():
+                        poppler_path = str(Path(p).parent)
+                        break
+            if poppler_path:
+                pages = convert_from_path(local_path, first_page=1, last_page=1, poppler_path=poppler_path)
+            else:
+                pages = convert_from_path(local_path, first_page=1, last_page=1)
+            if not pages:
+                return ""
+            img = pages[0]
+        else:
+            img = Image.open(local_path)
+        text = pytesseract.image_to_string(img)
+        return text or ""
+    except Exception as exc:
+        print(f"    OCR error for {local_path}: {exc}", flush=True)
+        return ""
+
+
+def parse_votes_from_ocr(text: str) -> dict:
+    """Heuristic parse of party codes and vote counts from OCR text.
+    Returns a mapping of PARTY_CODE -> votes (int).
+    """
+    parsed = {}
+    # look for patterns like APC 123, PDP: 456, "AA- 1,234"
+    for match in re.finditer(r"([A-Za-z]{2,6})[:\s\-]*([0-9][0-9,]*)", text):
+        code = match.group(1).upper()
+        try:
+            num = int(match.group(2).replace(",", ""))
+        except ValueError:
+            continue
+        parsed[code] = parsed.get(code, 0) + num
     return parsed
 
 
@@ -359,6 +466,27 @@ def fetch_ward_results(election_id, state_name, lga_name, ward, download_files):
                     print(f"    Downloaded/kept: {image_filename}", flush=True)
                 except requests.RequestException as exc:
                     print(f"    Failed download for {pu_code}: {exc}", flush=True)
+            # If the PU has no structured votes, try OCRing the uploaded document
+            parsed_votes = parse_votes(pu.get("votes"))
+            if not parsed_votes and image_url:
+                # ensure we have the image locally for OCR; download even if download_files is False
+                try:
+                    if not image_filename:
+                        image_filename = download_document(session, image_url, pu_code, lga_name)
+                        print(f"    Downloaded for OCR: {image_filename}", flush=True)
+                    local_path = DOWNLOAD_DIR / image_filename if image_filename else None
+                except requests.RequestException as exc:
+                    print(f"    OCR download failed for {pu_code}: {exc}", flush=True)
+                    local_path = None
+
+                if local_path and local_path.exists():
+                    text = ocr_extract_text(str(local_path))
+                    if text:
+                        ocr_votes = parse_votes_from_ocr(text)
+                        if ocr_votes:
+                            # inject votes as a list of party dicts so parse_votes() handles them
+                            pu["votes"] = [{"party_code": k, "vote": v} for k, v in ocr_votes.items()]
+                            print(f"    OCR parsed votes for {pu_code}: {ocr_votes}", flush=True)
 
             rows.append(build_result_row(state_name, lga_name, ward, pu, image_filename))
             time.sleep(REQUEST_SLEEP_SECONDS)
